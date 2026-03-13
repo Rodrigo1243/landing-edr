@@ -71,6 +71,14 @@
       margin-bottom: 32px;
     }
 
+    .back-link {
+      display: block; text-align: center;
+      font-size: 12px; font-weight: 700;
+      color: var(--texto-muted); text-decoration: none;
+      margin-bottom: 20px; transition: color .15s;
+    }
+    .back-link:hover { color: var(--verde-dark); }
+
     .toggle {
       display: flex;
       gap: 10px;
@@ -212,6 +220,7 @@
   <div class="card">
     <div class="logo">Ed<em>R</em></div>
     <div class="tagline">Plataforma de aprendizaje</div>
+    <a href="index.html" class="back-link">← Volver al inicio</a>
 
     <div class="toggle">
       <button id="btn-prof">Soy profesor</button>
