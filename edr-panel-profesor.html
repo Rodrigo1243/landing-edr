@@ -337,11 +337,7 @@
 
     <div class="section" id="sec-progreso">
       <div class="section-title">👥 Progreso de alumnos</div>
-      <div class="empty-state">
-        <div class="empty-icon">👥</div>
-        <div class="empty-title">Todavía no hay alumnos registrados</div>
-        <div class="empty-sub">Una vez que agregues alumnos, vas a ver su progreso acá.</div>
-      </div>
+      <div id="lista-progreso"></div>
     </div>
 
     <div class="section" id="sec-alumnos">
@@ -415,6 +411,20 @@
       await supabase.auth.signOut();
       window.location.href = 'edr-login.html';
     });
+
+    // ── Resumen ───────────────────────────────────────────────────
+    async function cargarResumen() {
+      const [{ count: totalAlumnos }, { count: totalClases }] = await Promise.all([
+        supabase.from('alumnos').select('*', { count: 'exact', head: true }),
+        supabase.from('clases').select('*', { count: 'exact', head: true })
+          .eq('profesor_id', session.user.id).eq('estado', 'publicada')
+      ]);
+      const stats = document.querySelectorAll('.stat-n');
+      if (stats[0]) stats[0].textContent = totalAlumnos || 0;
+      if (stats[1]) stats[1].textContent = totalClases || 0;
+    }
+
+    cargarResumen();
 
     // ── Clases ────────────────────────────────────────────────────
     async function cargarClases() {
@@ -623,6 +633,42 @@
 
     // Cargar alumnos al iniciar
     cargarAlumnos();
+
+    // ── Progreso ──────────────────────────────────────────────────
+    async function cargarProgreso() {
+      const { data: alumnos } = await supabase
+        .from('alumnos')
+        .select('id, nombre, usuario, grupo')
+        .order('nombre', { ascending: true });
+
+      const lista = document.getElementById('lista-progreso');
+
+      if (!alumnos || alumnos.length === 0) {
+        lista.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">Todavía no hay alumnos registrados</div><div class="empty-sub">Una vez que agregues alumnos, vas a ver su progreso acá.</div></div>`;
+        return;
+      }
+
+      const grupos = { exploradores: 'Exploradores', constructores: 'Constructores', avanzados: 'Avanzados' };
+
+      lista.innerHTML = alumnos.map(a => {
+        const iniciales = a.nombre.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+        return `
+          <div class="alumno-row">
+            <div class="alumno-avatar">${iniciales}</div>
+            <div class="item-info">
+              <div class="item-title">${a.nombre}</div>
+              <div class="item-meta">${grupos[a.grupo] || a.grupo} · @${a.usuario}</div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+              <div class="progress-pct">0%</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    cargarProgreso();
 
     // ── Navegación ────────────────────────────────────────────────
     const sections = ['sec-resumen','sec-clases','sec-quiz','sec-progreso','sec-alumnos'];
