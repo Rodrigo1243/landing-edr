@@ -323,12 +323,8 @@
           <div class="welcome-bar"><div class="welcome-bar-fill" style="width:0%"></div></div>
         </div>
       </div>
-      <div class="section-title">▶ Seguir donde dejaste</div>
-      <div class="empty-state">
-        <div class="empty-icon">🎬</div>
-        <div class="empty-title">Todavía no empezaste ninguna clase</div>
-        <div class="empty-sub">Cuando tu profe suba clases, vas a verlas acá.</div>
-      </div>
+      <div class="section-title">✅ Clases vistas</div>
+      <div id="lista-vistas"></div>
     </div>
 
     <div class="section" id="sec-clases">
@@ -437,6 +433,27 @@
     }
 
     function renderClases() {
+      // Sección "Clases vistas"
+      const listaVistas = document.getElementById('lista-vistas');
+      const vistasArr = window._clases.filter(c => window._vistas.has(c.id));
+      if (vistasArr.length === 0) {
+        listaVistas.innerHTML = `<div class="empty-state"><div class="empty-icon">🎬</div><div class="empty-title">Todavía no viste ninguna clase</div><div class="empty-sub">Las clases que veas van a aparecer acá.</div></div>`;
+      } else {
+        listaVistas.innerHTML = vistasArr.map(c => `
+          <div class="clase-card">
+            <div class="clase-thumb"><div class="play-btn" style="background:var(--verde-dark)">▶</div></div>
+            <div class="item-info">
+              <div class="item-title">${c.titulo}</div>
+              <div class="item-meta">✅ Vista</div>
+            </div>
+            <div class="clase-actions">
+              <button class="btn-ver" onclick="abrirClase('${c.id}')">Ver de nuevo →</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Sección "Mis clases" — todas
       const lista = document.getElementById('lista-clases-alumno');
       lista.innerHTML = window._clases.map((c, i) => {
         const vista = window._vistas.has(c.id);
@@ -449,7 +466,7 @@
             </div>
             <div class="clase-actions">
               ${vista ? '<span class="badge-done">✓ Vista</span>' : ''}
-              <button class="btn-ver" onclick="abrirClase('${c.id}')">Ver →</button>
+              <button class="btn-ver" onclick="abrirClase('${c.id}')">${vista ? 'Ver de nuevo →' : 'Ver →'}</button>
               ${c.pdf_url ? `<a class="btn-pdf" href="${c.pdf_url}" target="_blank" download>📄 PDF</a>` : ''}
             </div>
           </div>
