@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EdR — Escuela de Robótica</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,7 +65,7 @@
       cursor: pointer; transition: background .2s, color .2s;
       text-decoration: none; display: inline-block;
     }
-    .nav-login:hover { background: var(--verde); color: var(--blanco); }
+    .nav-login:hover { background: var(--verde); color: #fff; }
  
     /* ── HAMBURGER ── */
     .hamburger {
@@ -105,6 +106,7 @@
       font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
       text-decoration: none;
     }
+ 
     /* ── HERO ── */
     #hero {
       min-height: 100vh;
@@ -113,9 +115,7 @@
       background: var(--negro);
       position: relative; overflow: hidden;
     }
-    .hero-bg-circles {
-      position: absolute; inset: 0; pointer-events: none;
-    }
+    .hero-bg-circles { position: absolute; inset: 0; pointer-events: none; }
     .hero-bg-circles span {
       position: absolute; border-radius: 50%;
       background: var(--verde); opacity: .07;
@@ -132,7 +132,6 @@
       width: 180px; height: 180px; top: 40%; right: 30%; opacity:.09;
       animation: float3 7s ease-in-out infinite;
     }
- 
     @keyframes float1 {
       0%, 100% { transform: translate(0, 0) scale(1); }
       33%       { transform: translate(-30px, 20px) scale(1.04); }
@@ -218,9 +217,7 @@
  
     /* ── CÓMO FUNCIONA ── */
     #como { background: var(--gris); }
-    .steps-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
-    }
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
     .step-card {
       background: var(--blanco); border-radius: 20px;
       padding: 36px 32px; position: relative; overflow: hidden;
@@ -238,20 +235,17 @@
       border-radius: 16px; display: flex; align-items: center; justify-content: center;
       font-size: 1.8rem; margin-bottom: 20px;
     }
-    .step-card h3 {
-      font-size: 1.2rem; font-weight: 800; margin-bottom: 10px;
-    }
+    .step-card h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; }
     .step-card p { font-size: .95rem; color: #5a7054; line-height: 1.6; }
  
     /* ── PROGRAMAS ── */
     #programas { background: var(--blanco); }
-    .ages-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;
-    }
+    .ages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
     .age-card {
       border-radius: 24px; overflow: hidden;
       border: 2px solid var(--gris-medio);
       transition: border-color .25s, transform .25s;
+      cursor: pointer;
     }
     .age-card:hover { border-color: var(--verde); transform: translateY(-4px); }
     .age-img {
@@ -277,14 +271,18 @@
       display: flex; gap: 8px; align-items: flex-start;
     }
     .age-list li::before { content: '→'; color: var(--verde); font-weight: 700; flex-shrink: 0; }
+    .age-card .age-body::after {
+      content: 'Ver detalle →';
+      display: inline-block; margin-top: 16px;
+      font-family: 'Space Mono', monospace; font-size: .72rem;
+      letter-spacing: 1px; color: var(--verde); font-weight: 700;
+    }
  
     /* ── PROFESORES ── */
     #profesores { background: var(--negro); }
     #profesores .section-title { color: var(--blanco); }
     #profesores .section-sub { color: #7a9e72; }
-    .teachers-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;
-    }
+    .teachers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
     .teacher-card {
       background: rgba(255,255,255,.05);
       border: 2px solid rgba(91,187,58,.2);
@@ -292,39 +290,35 @@
       text-align: center;
       transition: border-color .25s, background .25s;
     }
-    .teacher-card:hover {
-      border-color: var(--verde);
-      background: rgba(91,187,58,.08);
-    }
+    .teacher-card:hover { border-color: var(--verde); background: rgba(91,187,58,.08); }
     .teacher-avatar {
       width: 90px; height: 90px; border-radius: 50%;
       margin: 0 auto 16px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 2.4rem;
-      border: 3px solid var(--verde);
+      font-size: 2.4rem; border: 3px solid var(--verde);
     }
     .teacher-card h3 { font-size: 1.1rem; font-weight: 800; color: var(--blanco); margin-bottom: 4px; }
     .teacher-role { font-size: .85rem; color: var(--verde); font-weight: 700; margin-bottom: 12px; }
-    .teacher-card p { font-size: .9rem; color: #7a9e72; line-height: 1.6; }
+    .teacher-card p { font-size: .9rem; color: #7a9e72; line-height: 1.6; margin-bottom: 16px; }
+    .teacher-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+    .teacher-tag {
+      font-size: .72rem; font-family: 'Space Mono', monospace; font-weight: 700;
+      background: rgba(91,187,58,.15); color: var(--verde);
+      padding: 4px 10px; border-radius: 100px;
+    }
  
-    /* ── FORMULARIO ── */
-    #inscripcion { background: var(--verde-claro); }
-    .form-layout {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start;
-    }
-    .form-info h2 { font-family: 'Space Mono', monospace; font-size: 2.2rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 20px; line-height: 1.2; }
-    .form-info p { font-size: 1rem; color: #3a6030; line-height: 1.7; margin-bottom: 28px; }
+    /* ── INSCRIPCIÓN ── */
+    #inscripcion { background: var(--negro); }
+    .form-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+    .form-info h2 { font-family: 'Space Mono', monospace; font-size: 2.2rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 20px; line-height: 1.2; color: var(--blanco); }
+    .form-info p { font-size: 1rem; color: #7a9e72; line-height: 1.7; margin-bottom: 28px; }
     .form-perks { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-    .form-perks li {
-      display: flex; align-items: center; gap: 12px;
-      font-weight: 700; font-size: .95rem; color: var(--texto);
-    }
+    .form-perks li { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: .95rem; color: #a8c4a0; }
     .form-perks li span.icon {
-      width: 36px; height: 36px; background: var(--verde);
+      width: 36px; height: 36px; background: rgba(91,187,58,.2);
       border-radius: 10px; display: flex; align-items: center;
       justify-content: center; font-size: 1rem; flex-shrink: 0;
     }
- 
     form {
       background: var(--blanco); border-radius: 24px;
       padding: 40px; display: flex; flex-direction: column; gap: 18px;
@@ -337,8 +331,7 @@
       padding: 12px 16px; border-radius: 12px;
       border: 2px solid var(--gris-medio);
       font-family: 'Nunito', sans-serif; font-size: .95rem; color: var(--texto);
-      background: var(--blanco); outline: none;
-      transition: border-color .2s;
+      background: var(--blanco); outline: none; transition: border-color .2s;
     }
     input:focus, select:focus, textarea:focus { border-color: var(--verde); }
     textarea { resize: vertical; min-height: 90px; }
@@ -351,9 +344,7 @@
     .submit-btn:hover { background: var(--verde-oscuro); transform: translateY(-2px); }
  
     /* ── FOOTER ── */
-    footer {
-      background: var(--negro); padding: 60px 48px 40px;
-    }
+    footer { background: var(--negro); padding: 60px 48px 40px; }
     .footer-grid {
       display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px;
       padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,.1);
@@ -365,9 +356,7 @@
     .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     .footer-col a { text-decoration: none; font-size: .9rem; color: #7a9e72; transition: color .2s; }
     .footer-col a:hover { color: var(--verde); }
-    .footer-bottom {
-      display: flex; justify-content: space-between; align-items: center;
-    }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; }
     .footer-bottom p { font-size: .82rem; color: #4a6a42; }
     .social-links { display: flex; gap: 12px; }
     .social-btn {
@@ -379,61 +368,34 @@
     }
     .social-btn:hover { background: var(--verde); color: var(--blanco); }
  
-    /* ── LOCATION SECTION ── */
-    .location-section {
-      display: grid; grid-template-columns: 1fr 400px;
-      height: 320px;
-    }
+    /* ── LOCATION ── */
+    .location-section { display: grid; grid-template-columns: 1fr 400px; height: 320px; }
     .location-map iframe { width: 100%; height: 100%; border: none; display: block; }
     .location-info {
       background: var(--verde); padding: 44px 40px;
       display: flex; flex-direction: column; justify-content: center; gap: 18px;
     }
-    .location-eyebrow {
-      font-family: 'Space Mono', monospace; font-size: .68rem;
-      letter-spacing: 3px; text-transform: uppercase;
-      color: rgba(255,255,255,.6);
-    }
-    .location-name {
-      font-family: 'Space Mono', monospace; font-size: 1.5rem;
-      font-weight: 700; color: var(--blanco); line-height: 1.2; letter-spacing: -1px;
-    }
+    .location-eyebrow { font-family: 'Space Mono', monospace; font-size: .68rem; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,.6); }
+    .location-name { font-family: 'Space Mono', monospace; font-size: 1.5rem; font-weight: 700; color: var(--blanco); line-height: 1.2; letter-spacing: -1px; }
     .location-details { display: flex; flex-direction: column; gap: 10px; }
-    .location-row {
-      display: flex; align-items: center; gap: 10px;
-      color: rgba(255,255,255,.9); font-size: .92rem; font-weight: 600;
-    }
-    .location-row .loc-icon {
-      width: 30px; height: 30px; border-radius: 8px;
-      background: rgba(255,255,255,.2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: .85rem; flex-shrink: 0;
-    }
+    .location-row { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,.9); font-size: .92rem; font-weight: 600; }
+    .location-row .loc-icon { width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: .85rem; flex-shrink: 0; }
     .location-cta {
       display: inline-flex; align-items: center; gap: 8px;
       background: var(--blanco); color: var(--verde-oscuro);
       font-family: 'Nunito', sans-serif; font-weight: 800; font-size: .88rem;
       padding: 10px 20px; border-radius: 100px; text-decoration: none;
-      margin-top: 6px; align-self: flex-start;
-      transition: transform .2s, box-shadow .2s;
+      margin-top: 6px; align-self: flex-start; transition: transform .2s, box-shadow .2s;
     }
     .location-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.15); }
-    @media (max-width: 900px) {
-      .location-section { grid-template-columns: 1fr; height: auto; }
-      .location-map { height: 220px; }
-    }
  
     /* ── SCROLL INDICATOR ── */
     .scroll-indicator {
       position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
       display: flex; flex-direction: column; align-items: center; gap: 6px;
-      z-index: 2; cursor: pointer;
-      animation: fadeUp .7s ease .8s both;
+      z-index: 2; cursor: pointer; animation: fadeUp .7s ease .8s both;
     }
-    .scroll-indicator span {
-      font-size: .7rem; font-family: 'Space Mono', monospace;
-      letter-spacing: 2px; text-transform: uppercase; color: #4a6a42;
-    }
+    .scroll-indicator span { font-size: .7rem; font-family: 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: #4a6a42; }
     .scroll-arrow {
       width: 36px; height: 36px; border-radius: 50%;
       border: 2px solid rgba(91,187,58,.3);
@@ -441,96 +403,81 @@
       color: var(--verde); font-size: 1rem;
       animation: bounce 2s ease-in-out infinite;
     }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(6px); }
-    }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
  
-    /* ── WHATSAPP FLOTANTE (mobile) ── */
+    /* ── WHATSAPP FLOTANTE ── */
     .whatsapp-float {
       display: none;
       position: fixed; bottom: 28px; right: 24px; z-index: 200;
-      background: #25D366;
-      width: 60px; height: 60px; border-radius: 50%;
+      background: #25D366; width: 60px; height: 60px; border-radius: 50%;
       align-items: center; justify-content: center;
       box-shadow: 0 6px 24px rgba(37,211,102,.5);
       animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
       text-decoration: none;
     }
-    @keyframes popIn {
-      from { transform: scale(0.5); opacity: 0; }
-      to   { transform: scale(1); opacity: 1; }
-    }
+    @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
  
-    /* ── CTA FLOTANTE MOBILE ── */
+    /* ── MOBILE CTA BAR ── */
     .mobile-cta-bar {
       display: none;
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 199;
-      background: var(--blanco);
-      border-top: 2px solid var(--verde-claro);
-      padding: 12px 20px;
-      gap: 10px;
-      box-shadow: 0 -8px 30px rgba(0,0,0,.1);
+      background: var(--blanco); border-top: 2px solid var(--verde-claro);
+      padding: 12px 20px; gap: 10px; box-shadow: 0 -8px 30px rgba(0,0,0,.1);
     }
     .mobile-cta-bar a {
       flex: 1; text-align: center; padding: 13px;
       border-radius: 12px; font-family: 'Nunito', sans-serif;
       font-weight: 800; font-size: .95rem; text-decoration: none;
     }
-    .mobile-cta-bar .mcta-wp {
-      background: #25D366; color: var(--blanco);
-    }
-    .mobile-cta-bar .mcta-inscribir {
-      background: var(--verde); color: var(--blanco);
-    }
+    .mobile-cta-bar .mcta-wp { background: #25D366; color: var(--blanco); }
+    .mobile-cta-bar .mcta-inscribir { background: var(--verde); color: var(--blanco); }
  
-    /* ── TEACHER CARD mejorada ── */
-    .teacher-card {
-      background: rgba(255,255,255,.05);
-      border: 2px solid rgba(91,187,58,.2);
-      border-radius: 20px; padding: 32px;
-      text-align: center;
-      transition: border-color .25s, background .25s;
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(10,20,8,.7); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center; padding: 24px;
     }
-    .teacher-card:hover {
-      border-color: var(--verde);
-      background: rgba(91,187,58,.08);
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--blanco); border-radius: 28px;
+      max-width: 680px; width: 100%; max-height: 88vh;
+      overflow-y: auto; position: relative;
+      animation: modalIn .3s cubic-bezier(.34,1.3,.64,1) both;
     }
-    .teacher-avatar {
-      width: 90px; height: 90px; border-radius: 50%;
-      margin: 0 auto 16px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2.4rem;
-      border: 3px solid var(--verde);
+    @keyframes modalIn { from { opacity: 0; transform: scale(.92) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .modal-header { padding: 36px 40px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+    .modal-badge {
+      display: inline-block; background: var(--verde-claro); color: var(--verde-oscuro);
+      font-family: 'Space Mono', monospace; font-size: .75rem; font-weight: 700;
+      padding: 5px 14px; border-radius: 100px; margin-bottom: 10px;
     }
-    .teacher-card h3 { font-size: 1.1rem; font-weight: 800; color: var(--blanco); margin-bottom: 4px; }
-    .teacher-role { font-size: .85rem; color: var(--verde); font-weight: 700; margin-bottom: 12px; }
-    .teacher-card p { font-size: .9rem; color: #7a9e72; line-height: 1.6; margin-bottom: 16px; }
-    .teacher-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
-    .teacher-tag {
-      font-size: .72rem; font-family: 'Space Mono', monospace; font-weight: 700;
-      background: rgba(91,187,58,.15); color: var(--verde);
-      padding: 4px 10px; border-radius: 100px;
+    .modal-title { font-family: 'Space Mono', monospace; font-size: 1.8rem; font-weight: 700; letter-spacing: -1px; color: var(--negro); }
+    .modal-close {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--gris); border: none; font-size: 1.2rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-left: 16px; margin-top: 4px; transition: background .2s;
     }
+    .modal-close:hover { background: var(--gris-medio); }
+    .modal-body { padding: 24px 40px 40px; }
+    .modal-modules { display: flex; flex-direction: column; gap: 24px; }
+    .modal-module { background: var(--gris); border-radius: 16px; padding: 24px; border-left: 4px solid var(--verde); }
+    .modal-module h4 { font-family: 'Space Mono', monospace; font-size: .85rem; font-weight: 700; color: var(--verde-oscuro); margin-bottom: 8px; letter-spacing: .5px; }
+    .modal-module p { font-size: .92rem; color: #4a6a42; line-height: 1.7; }
+    .modal-module ul { list-style: none; margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .modal-module ul li { font-size: .9rem; color: var(--texto); display: flex; gap: 8px; align-items: flex-start; }
+    .modal-module ul li::before { content: '→'; color: var(--verde); font-weight: 700; flex-shrink: 0; }
+    .modal-cta {
+      margin-top: 28px; display: block; width: 100%;
+      background: var(--verde); color: var(--blanco); border: none;
+      padding: 14px; border-radius: 12px; font-family: 'Nunito', sans-serif;
+      font-weight: 800; font-size: 1rem; cursor: pointer; text-align: center;
+      text-decoration: none; transition: background .2s;
+    }
+    .modal-cta:hover { background: var(--verde-oscuro); }
  
-    /* ── INSCRIPCIÓN dark ── */
-    #inscripcion { background: var(--negro); }
-    .form-info h2 { font-family: 'Space Mono', monospace; font-size: 2.2rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 20px; line-height: 1.2; color: var(--blanco); }
-    .form-info p { font-size: 1rem; color: #7a9e72; line-height: 1.7; margin-bottom: 28px; }
-    .form-perks { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-    .form-perks li {
-      display: flex; align-items: center; gap: 12px;
-      font-weight: 700; font-size: .95rem; color: #a8c4a0;
-    }
-    .form-perks li span.icon {
-      width: 36px; height: 36px; background: rgba(91,187,58,.2);
-      border-radius: 10px; display: flex; align-items: center;
-      justify-content: center; font-size: 1rem; flex-shrink: 0;
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     .hero-content > * { animation: fadeUp .7s ease both; }
     .hero-tag        { animation-delay: .1s; }
     .hero-content h1 { animation-delay: .2s; }
@@ -557,18 +504,18 @@
       .location-map { height: 220px; }
       .scroll-indicator { display: none; }
       .whatsapp-float { display: flex; }
+      .mobile-cta-bar { display: flex; }
+      body { padding-bottom: 80px; }
+    }
+    @media (max-width: 600px) {
+      .modal-header { padding: 24px 24px 0; }
+      .modal-body { padding: 20px 24px 32px; }
+      .modal-title { font-size: 1.4rem; }
     }
  
-    /* success */
-    #form-success {
-      display: none; text-align: center; padding: 40px 20px;
-    }
-    #form-success .check {
-      font-size: 3.5rem; margin-bottom: 16px;
-    }
-    #form-success h3 {
-      font-size: 1.5rem; font-weight: 800; margin-bottom: 8px;
-    }
+    #form-success { display: none; text-align: center; padding: 40px 20px; }
+    #form-success .check { font-size: 3.5rem; margin-bottom: 16px; }
+    #form-success h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
     #form-success p { color: #5a7054; }
   </style>
 </head>
@@ -606,34 +553,21 @@
  
 <!-- HERO -->
 <section id="hero">
-  <div class="hero-bg-circles">
-    <span></span><span></span><span></span>
-  </div>
+  <div class="hero-bg-circles"><span></span><span></span><span></span></div>
   <div class="hero-content">
-    <span class="hero-tag">🤖 Escuela de Robótica · Buenos Aires</span>
+    <span class="hero-tag">🤖 Escuela de Robótica Argentina</span>
     <h1>Aprender<br>a crear el<br><em>futuro.</em></h1>
-    <p>En EdR, los chicos de 6 a 12 años construyen sus propios robots y proyectos de automatización. Aprender jugando, crear con propósito.</p>
+    <p>En EdR, los chicos de 7 a 15 años construyen sus propios robots y proyectos de automatización. Aprender jugando, crear con propósito.</p>
     <div class="hero-btns">
       <a href="#inscripcion" class="btn-primary">Quiero inscribir a mi hijo ✦</a>
       <a href="#programas" class="btn-outline">Ver programas</a>
     </div>
   </div>
   <div class="hero-stats">
-    <div class="stat">
-      <span class="stat-num">6–12</span>
-      <div class="stat-label">años de edad</div>
-    </div>
-    <div class="stat">
-      <span class="stat-num">100%</span>
-      <div class="stat-label">proyectos propios</div>
-    </div>
-    <div class="stat">
-      <span class="stat-num">3</span>
-      <div class="stat-label">niveles de cursada</div>
-    </div>
+    <div class="stat"><span class="stat-num">7–15</span><div class="stat-label">años de edad</div></div>
+    <div class="stat"><span class="stat-num">100%</span><div class="stat-label">proyectos propios</div></div>
+    <div class="stat"><span class="stat-num">3</span><div class="stat-label">niveles de cursada</div></div>
   </div>
- 
-  <!-- Scroll indicator -->
   <div class="scroll-indicator" onclick="document.getElementById('como').scrollIntoView({behavior:'smooth'})">
     <span>Scroll</span>
     <div class="scroll-arrow">↓</div>
@@ -643,32 +577,17 @@
 <!-- LOCATION + MAPA -->
 <div class="location-section">
   <div class="location-map">
-    <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3279.9!2d-58.5632!3d-34.6441!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bcc8b0c5f9b0c3%3A0x0!2sAvellaneda+335%2C+Ramos+Mej%C3%ADa%2C+Buenos+Aires!5e0!3m2!1ses!2sar!4v1700000000000!5m2!1ses!2sar&q=Avellaneda+335,+Ramos+Mejia,+La+Matanza,+Buenos+Aires"
-      allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-      title="Ubicación EdR - Avellaneda 335, Ramos Mejía">
-    </iframe>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3279.9!2d-58.5632!3d-34.6441!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bcc8b0c5f9b0c3%3A0x0!2sAvellaneda+335%2C+Ramos+Mej%C3%ADa%2C+Buenos+Aires!5e0!3m2!1ses!2sar!4v1700000000000!5m2!1ses!2sar&q=Avellaneda+335,+Ramos+Mejia,+La+Matanza,+Buenos+Aires" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación EdR - Avellaneda 335, Ramos Mejía"></iframe>
   </div>
   <div class="location-info">
     <div class="location-eyebrow">📍 dónde encontrarnos</div>
-    <div class="location-name">La Bohemia<br>Atelier</div>
+    <div class="location-name">La Bohemia<br>Atelier - Workshop</div>
     <div class="location-details">
-      <div class="location-row">
-        <span class="loc-icon">🏠</span>
-        Avellaneda 335, Ramos Mejía
-      </div>
-      <div class="location-row">
-        <span class="loc-icon">🗺️</span>
-        La Matanza, Buenos Aires
-      </div>
-      <div class="location-row">
-        <span class="loc-icon">🚌</span>
-        Fácil acceso en transporte público
-      </div>
+      <div class="location-row"><span class="loc-icon">🏠</span>Avellaneda 335, Ramos Mejía</div>
+      <div class="location-row"><span class="loc-icon">🗺️</span>La Matanza, Buenos Aires</div>
+      <div class="location-row"><span class="loc-icon">🚌</span>Fácil acceso en transporte público</div>
     </div>
-    <a href="https://maps.google.com/?q=Avellaneda+335,+Ramos+Mejia,+La+Matanza,+Buenos+Aires" target="_blank" class="location-cta">
-      Abrir en Google Maps →
-    </a>
+    <a href="https://maps.google.com/?q=Avellaneda+335,+Ramos+Mejia,+La+Matanza,+Buenos+Aires" target="_blank" class="location-cta">Abrir en Google Maps →</a>
   </div>
 </div>
  
@@ -705,10 +624,10 @@
   <h2 class="section-title">Un programa<br>para cada etapa</h2>
   <p class="section-sub">Cada grupo trabaja con materiales y desafíos adaptados a su nivel de desarrollo cognitivo y motor.</p>
   <div class="ages-grid">
-    <div class="age-card">
+    <div class="age-card" onclick="openModal('exploradores')">
       <div class="age-img a1">🐛</div>
       <div class="age-body">
-        <span class="age-badge">6 – 8 años</span>
+        <span class="age-badge">7 – 9 años</span>
         <h3>Exploradores</h3>
         <p>Primeros pasos en robótica. Construcción libre, sensores simples y lógica básica de programación visual.</p>
         <ul class="age-list">
@@ -718,10 +637,10 @@
         </ul>
       </div>
     </div>
-    <div class="age-card">
+    <div class="age-card" onclick="openModal('constructores')">
       <div class="age-img a2">⚙️</div>
       <div class="age-body">
-        <span class="age-badge">9 – 10 años</span>
+        <span class="age-badge">10 – 12 años</span>
         <h3>Constructores</h3>
         <p>Proyectos más complejos. Introducción a la programación por bloques y primeros conceptos de automatización.</p>
         <ul class="age-list">
@@ -731,16 +650,17 @@
         </ul>
       </div>
     </div>
-    <div class="age-card">
+    <div class="age-card" onclick="openModal('innovadores')">
       <div class="age-img a3">🚀</div>
       <div class="age-body">
-        <span class="age-badge">11 – 12 años</span>
+        <span class="age-badge">13 – 15 años</span>
         <h3>Innovadores</h3>
-        <p>Diseño y programación de prototipos completos. Primeros contactos con código real y electrónica.</p>
+        <p>Diseño y programación de prototipos completos. Primeros contactos con código real, electrónica e inteligencia artificial.</p>
         <ul class="age-list">
           <li>Arduino + sensores avanzados</li>
           <li>Introducción a Python</li>
           <li>Proyectos de automatización</li>
+          <li>Introducción al uso de IA</li>
         </ul>
       </div>
     </div>
@@ -755,8 +675,8 @@
   <div class="teachers-grid">
     <div class="teacher-card">
       <div class="teacher-avatar" style="background:rgba(91,187,58,.1)">👩‍🏫</div>
-      <h3>Directora & Fundadora</h3>
-      <div class="teacher-role">Directora pedagógica</div>
+      <h3>Marcela Curiale</h3>
+      <div class="teacher-role">Directora & Co-fundadora</div>
       <p>Especialista en educación STEAM, con más de 10 años acompañando el desarrollo de chicos a través de la tecnología.</p>
       <div class="teacher-tags">
         <span class="teacher-tag">Educación STEAM</span>
@@ -766,8 +686,8 @@
     </div>
     <div class="teacher-card">
       <div class="teacher-avatar" style="background:rgba(91,187,58,.1)">🧑‍💻</div>
-      <h3>Instructor de Robótica</h3>
-      <div class="teacher-role">Robótica & programación</div>
+      <h3>Marcelo Cejas</h3>
+      <div class="teacher-role">Profesor de Robótica & Co-fundador</div>
       <p>Ingeniero electrónico y docente. Diseña los proyectos de cada módulo y acompaña a los grupos intermedios y avanzados.</p>
       <div class="teacher-tags">
         <span class="teacher-tag">Arduino</span>
@@ -777,11 +697,11 @@
     </div>
     <div class="teacher-card">
       <div class="teacher-avatar" style="background:rgba(91,187,58,.1)">👩‍🔬</div>
-      <h3>Instructora de Iniciación</h3>
-      <div class="teacher-role">Nivel inicial & primario</div>
-      <p>Maestra con formación en programación educativa. Especializada en los grupos de 6 a 8 años, etapa Exploradores.</p>
+      <h3>Mariela Etcheber</h3>
+      <div class="teacher-role">Instructora de Iniciación & Co-fundadora</div>
+      <p>Maestra con formación en programación educativa. Especializada en los grupos iniciales, etapa Exploradores.</p>
       <div class="teacher-tags">
-        <span class="teacher-tag">6–8 años</span>
+        <span class="teacher-tag">7–9 años</span>
         <span class="teacher-tag">Scratch</span>
         <span class="teacher-tag">LEGO</span>
       </div>
@@ -799,44 +719,40 @@
       <ul class="form-perks">
         <li><span class="icon">✓</span> Primera clase de prueba sin costo</li>
         <li><span class="icon">📍</span> Avellaneda 335, Ramos Mejía</li>
-        <li><span class="icon">🏠</span> La Bohemia Atelier</li>
-        <li><span class="icon">📅</span> Clases semanales, grupos reducidos</li>
+        <li><span class="icon">🏠</span> La Bohemia Atelier - Workshop</li>
+        <li><span class="icon">📅</span> Lunes · 17:30–18:45 y 19:00–20:15</li>
+        <li><span class="icon">🤖</span> Introducción al uso de IA</li>
       </ul>
     </div>
- 
     <div>
-      <form id="contact-form">
+      <form id="contact-form" action="https://formspree.io/f/xgonklpz" method="POST">
         <div class="form-row">
           <div class="field">
             <label for="nombre-padre">Tu nombre (adulto responsable)</label>
-            <input type="text" id="nombre-padre" placeholder="Ej: María García" required />
+            <input type="text" id="nombre-padre" name="nombre_padre" placeholder="Ej: María García" required />
           </div>
           <div class="field">
             <label for="nombre-nino">Nombre del niño/a</label>
-            <input type="text" id="nombre-nino" placeholder="Ej: Tomás" required />
+            <input type="text" id="nombre-nino" name="nombre_nino" placeholder="Ej: Tomás" required />
           </div>
         </div>
         <div class="form-row">
           <div class="field">
             <label for="edad">Edad del niño/a</label>
-            <select id="edad" required>
+            <select id="edad" name="edad" required>
               <option value="" disabled selected>Seleccioná</option>
-              <option>6 años</option>
-              <option>7 años</option>
-              <option>8 años</option>
-              <option>9 años</option>
-              <option>10 años</option>
-              <option>11 años</option>
-              <option>12 años</option>
+              <option>7 años</option><option>8 años</option><option>9 años</option>
+              <option>10 años</option><option>11 años</option><option>12 años</option>
+              <option>13 años</option><option>14 años</option><option>15 años</option>
             </select>
           </div>
           <div class="field">
             <label for="programa">Programa de interés</label>
-            <select id="programa" required>
+            <select id="programa" name="programa" required>
               <option value="" disabled selected>Seleccioná</option>
-              <option>Exploradores (6–8 años)</option>
-              <option>Constructores (9–10 años)</option>
-              <option>Innovadores (11–12 años)</option>
+              <option>Exploradores (7–9 años)</option>
+              <option>Constructores (10–12 años)</option>
+              <option>Innovadores (13–15 años)</option>
               <option>No sé todavía</option>
             </select>
           </div>
@@ -844,25 +760,23 @@
         <div class="form-row">
           <div class="field">
             <label for="tel">Teléfono / WhatsApp</label>
-            <input type="tel" id="tel" placeholder="Ej: 11 1234-5678" required />
+            <input type="tel" id="tel" name="telefono" placeholder="Ej: 11 1234-5678" required />
           </div>
           <div class="field">
             <label for="email">Email</label>
-            <input type="email" id="email" placeholder="tu@email.com" />
+            <input type="email" id="email" name="email" placeholder="tu@email.com" />
           </div>
         </div>
         <div class="field">
           <label for="mensaje">¿Alguna consulta o comentario?</label>
-          <textarea id="mensaje" placeholder="Contanos lo que quieras saber…"></textarea>
+          <textarea id="mensaje" name="mensaje" placeholder="Contanos lo que quieras saber…"></textarea>
         </div>
         <div class="field">
           <label for="horario">¿Qué días/horarios preferís?</label>
-          <select id="horario">
+          <select id="horario" name="horario">
             <option value="" disabled selected>Seleccioná</option>
-            <option>Lunes a viernes, tarde</option>
-            <option>Sábados, mañana</option>
-            <option>Sábados, tarde</option>
-            <option>Me adapto al horario disponible</option>
+            <option>Lunes 17:30 – 18:45</option>
+            <option>Lunes 19:00 – 20:15</option>
           </select>
         </div>
         <button type="submit" class="submit-btn">Quiero la clase de prueba gratuita →</button>
@@ -881,7 +795,7 @@
   <div class="footer-grid">
     <div class="footer-brand">
       <span class="logo">Ed<span>R</span></span>
-      <p>Escuela de Robótica para niños de 6 a 12 años. Aprender haciendo, crear con propósito.</p>
+      <p>Escuela de Robótica para niños de 7 a 15 años. Aprender haciendo, crear con propósito.</p>
     </div>
     <div class="footer-col">
       <h4>Navegación</h4>
@@ -897,22 +811,19 @@
       <ul>
         <li><a href="#">Avellaneda 335, Ramos Mejía</a></li>
         <li><a href="#">La Matanza, Buenos Aires</a></li>
-        <li><a href="#">La Bohemia Atelier</a></li>
+        <li><a href="#">La Bohemia Atelier - Workshop</a></li>
       </ul>
     </div>
   </div>
   <div class="footer-bottom">
     <p>© 2025 EdR — Escuela de Robótica · Todos los derechos reservados</p>
     <div class="social-links">
-      <!-- Instagram -->
-      <a href="#" class="social-btn" title="Instagram">
+      <a href="https://instagram.com/escueladerobotica_arg" target="_blank" class="social-btn" title="Instagram">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
       </a>
-      <!-- WhatsApp -->
-      <a href="https://wa.me/549XXXXXXXXXX" target="_blank" class="social-btn" title="WhatsApp">
+      <a href="https://wa.me/5491149492177?text=Hola!%20Me%20interesa%20la%20clase%20de%20prueba%20de%20EdR" target="_blank" class="social-btn" title="WhatsApp">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       </a>
-      <!-- Facebook -->
       <a href="#" class="social-btn" title="Facebook">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
       </a>
@@ -920,29 +831,46 @@
   </div>
 </footer>
  
+<!-- WHATSAPP FLOTANTE MOBILE -->
+<a href="https://wa.me/5491149492177?text=Hola!%20Me%20interesa%20la%20clase%20de%20prueba%20de%20EdR" target="_blank" class="whatsapp-float" id="wa-float" title="Contactar por WhatsApp">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+ 
+<!-- MODAL PROGRAMAS -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-badge" id="modal-badge"></div>
+        <div class="modal-title" id="modal-title"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-modules" id="modal-modules"></div>
+      <a href="#inscripcion" class="modal-cta" onclick="closeModal()">Quiero inscribirme →</a>
+    </div>
+  </div>
+</div>
+ 
 <script>
-  // ── Scroll suave para todos los links internos ──
   document.querySelectorAll('a[href^="#"]').forEach(link => {
     link.addEventListener('click', function(e) {
       const target = document.querySelector(this.getAttribute('href'));
       if (target) {
         e.preventDefault();
-        const offset = 68; // altura del nav
-        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        const top = target.getBoundingClientRect().top + window.scrollY - 68;
         window.scrollTo({ top, behavior: 'smooth' });
       }
     });
   });
  
-  // ── Hamburguesa ──
   const hamburger = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobile-menu');
- 
   hamburger.addEventListener('click', () => {
     const isOpen = mobileMenu.classList.contains('open');
     if (isOpen) {
       mobileMenu.classList.remove('open');
-      mobileMenu.style.display = '';
       setTimeout(() => { mobileMenu.style.display = 'none'; }, 350);
     } else {
       mobileMenu.style.display = 'block';
@@ -950,8 +878,6 @@
     }
     hamburger.classList.toggle('open');
   });
- 
-  // Cerrar el menú al tocar un link
   document.querySelectorAll('.nav-mobile-link').forEach(link => {
     link.addEventListener('click', () => {
       hamburger.classList.remove('open');
@@ -960,38 +886,92 @@
     });
   });
  
-  // ── Form submit ──
-  document.getElementById('contact-form').addEventListener('submit', function(e) {
+  document.getElementById('contact-form').addEventListener('submit', async function(e) {
     e.preventDefault();
-    this.style.display = 'none';
-    document.getElementById('form-success').style.display = 'block';
+    const form = this;
+    const btn = form.querySelector('.submit-btn');
+    btn.textContent = 'Enviando...';
+    btn.disabled = true;
+    try {
+      const response = await fetch('https://formspree.io/f/xgonklpz', {
+        method: 'POST', body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (response.ok) {
+        form.style.display = 'none';
+        document.getElementById('form-success').style.display = 'block';
+      } else {
+        btn.textContent = 'Hubo un error, intentá de nuevo';
+        btn.disabled = false;
+      }
+    } catch {
+      btn.textContent = 'Hubo un error, intentá de nuevo';
+      btn.disabled = false;
+    }
   });
  
-  // ── Scroll reveal ──
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(el => {
-      if (el.isIntersecting) {
-        el.target.style.opacity = '1';
-        el.target.style.transform = 'translateY(0)';
-      }
+      if (el.isIntersecting) { el.target.style.opacity = '1'; el.target.style.transform = 'translateY(0)'; }
     });
   }, { threshold: 0.1 });
- 
   document.querySelectorAll('.step-card, .age-card, .teacher-card').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(24px)';
+    el.style.opacity = '0'; el.style.transform = 'translateY(24px)';
     el.style.transition = 'opacity .5s ease, transform .5s ease, border-color .25s, box-shadow .25s';
     observer.observe(el);
   });
-</script>
-<!-- WHATSAPP FLOTANTE MOBILE -->
-<a href="https://wa.me/549XXXXXXXXXX?text=Hola!%20Me%20interesa%20la%20clase%20de%20prueba%20de%20EdR" 
-   target="_blank" 
-   class="whatsapp-float" 
-   id="wa-float"
-   title="Contactar por WhatsApp">
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-</a>
  
+  const modalData = {
+    exploradores: {
+      badge: '7 – 9 años', title: 'Exploradores',
+      modules: [
+        { icon: '🤖', title: 'Robótica Educativa', text: 'Dando sus primeros pasos en el mundo de la tecnología, los Exploradores aprenden a construir y programar robots sencillos usando plataformas como micro:bit. Cada proyecto es una aventura donde aplican creatividad y pensamiento lógico para resolver desafíos simples, descubriendo conceptos básicos de STEAM de forma lúdica y entretenida.', items: ['Construcción con bloques y kits programables', 'Movimiento, sensores y actuadores básicos', 'Resolución de desafíos guiados'] },
+        { icon: '💻', title: 'Programación Visual', text: 'Usamos Scratch y MakeCode para que incluso los más chicos puedan crear sus propios juegos, animaciones y proyectos interactivos. La programación por bloques hace que aprender lógica sea tan fácil como armar un rompecabezas.', items: ['Scratch: juegos y animaciones', 'MakeCode para micro:bit', 'Proyectos interactivos y creativos'] },
+        { icon: '🎨', title: 'Modelado 3D Inicial', text: 'Con Tinkercad, los chicos dan sus primeros pasos en el diseño 3D modificando prototipos prearmados y aprendiendo los conceptos básicos del modelado digital.', items: ['Exploración de Tinkercad', 'Modificación de modelos existentes', 'Introducción al pensamiento espacial'] }
+      ]
+    },
+    constructores: {
+      badge: '10 – 12 años', title: 'Constructores',
+      modules: [
+        { icon: '🤖', title: 'Robótica con Arduino', text: 'Los Constructores dan un salto importante: empiezan a usar Arduino para diseñar, prototipar y programar robots más complejos. Aprenden a combinar electrónica, mecánica y código para crear proyectos reales que funcionan de verdad.', items: ['Arduino básico y circuitos electrónicos', 'Diseño y construcción de prototipos', 'Integración de sensores y motores'] },
+        { icon: '💻', title: 'Programación por Bloques y Más', text: 'Profundizan en Scratch y MakeCode mientras dan sus primeros pasos en mBlock, que permite combinar programación visual con Arduino.', items: ['Scratch avanzado y proyectos colaborativos', 'mBlock: puente entre bloques y código', 'Lógica condicional y bucles'] },
+        { icon: '🎨', title: 'Modelado 3D Intermedio', text: 'En Tinkercad avanzan hacia diseños propios, creando piezas y componentes para sus proyectos de robótica.', items: ['Diseño de piezas originales en Tinkercad', 'Integración de diseño 3D con robótica', 'Prototipado de componentes propios'] }
+      ]
+    },
+    innovadores: {
+      badge: '13 – 15 años', title: 'Innovadores',
+      modules: [
+        { icon: '🤖', title: 'Robótica Avanzada', text: 'Los Innovadores diseñan y construyen prototipos completos usando Arduino con sensores avanzados. Aplican habilidades de ingeniería para crear sistemas de automatización reales.', items: ['Arduino + sensores y actuadores avanzados', 'Diseño de sistemas de automatización', 'Proyectos de ingeniería completos'] },
+        { icon: '💻', title: 'Python y Programación Real', text: 'Hacen el salto a Python, uno de los lenguajes más usados en el mundo tech. Aprenden a escribir código real que controla hardware, procesa datos y resuelve problemas concretos.', items: ['Fundamentos de Python aplicado', 'Control de hardware con código', 'Algoritmos y estructuras de datos básicas'] },
+        { icon: '🧠', title: 'Inteligencia Artificial', text: 'Aprenden los fundamentos de la IA a través de proyectos prácticos: crean robots con capacidades inteligentes, sistemas de reconocimiento y toma de decisiones autónoma.', items: ['Fundamentos de IA y machine learning', 'Robots con capacidades de decisión autónoma', 'Proyectos de IA aplicada a problemas reales'] },
+        { icon: '🎨', title: 'Modelado 3D Avanzado', text: 'Dominan Tinkercad y exploran herramientas más sofisticadas para diseñar componentes complejos que integran directamente en sus proyectos de robótica e IA.', items: ['Modelado complejo en Tinkercad', 'Diseño orientado a fabricación', 'Integración diseño-robótica-IA'] }
+      ]
+    }
+  };
+ 
+  function openModal(key) {
+    const data = modalData[key];
+    document.getElementById('modal-badge').textContent = data.badge;
+    document.getElementById('modal-title').textContent = data.title;
+    document.getElementById('modal-modules').innerHTML = data.modules.map(m => `
+      <div class="modal-module">
+        <h4>${m.icon} ${m.title}</h4>
+        <p>${m.text}</p>
+        <ul>${m.items.map(i => `<li>${i}</li>`).join('')}</ul>
+      </div>
+    `).join('');
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+ 
+  function closeModal(e) {
+    if (e && e.target !== document.getElementById('modal-overlay') && e.type !== 'click') return;
+    if (e && e.currentTarget === document.getElementById('modal-overlay') && e.target !== e.currentTarget) return;
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+ 
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
 </body>
 </html>
