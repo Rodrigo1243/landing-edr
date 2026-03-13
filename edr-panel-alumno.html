@@ -623,7 +623,8 @@
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       el.classList.add('active');
       isScrollingFromNav = true;
-      window.scrollTo({ top: target.offsetTop - 20, behavior: 'smooth' });
+      const top = target.getBoundingClientRect().top + window.scrollY - 20;
+      window.scrollTo({ top, behavior: 'smooth' });
       setTimeout(() => { isScrollingFromNav = false; }, 800);
       closeSidebar();
     }
@@ -646,7 +647,8 @@
       if (atBottom) { setActiveNav(sections[sections.length - 1]); return; }
       let current = sections[0];
       sections.forEach(id => {
-        if (document.getElementById(id).offsetTop <= window.scrollY + 100) current = id;
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= 120) current = id;
       });
       setActiveNav(current);
     });
