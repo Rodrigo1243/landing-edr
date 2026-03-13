@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>EdR — Panel Profesor</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👨‍🏫</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -311,20 +312,22 @@
       <button class="add-btn" onclick="toggleForm()">+ Subir nueva clase</button>
       <div class="form-card" id="form-clase">
         <div class="form-row">
-          <div class="field"><label>Título</label><input type="text" placeholder="Ej: Intro a Arduino" /></div>
+          <div class="field"><label>Título</label><input id="clase-titulo" type="text" placeholder="Ej: Intro a Arduino" /></div>
           <div class="field"><label>Grupo</label>
-            <select>
-              <option>Exploradores (7–9 años)</option>
-              <option>Constructores (10–12 años)</option>
-              <option>Avanzados (13–15 años)</option>
+            <select id="clase-grupo">
+              <option value="exploradores">Exploradores (7–9 años)</option>
+              <option value="constructores">Constructores (10–12 años)</option>
+              <option value="avanzados">Avanzados (13–15 años)</option>
             </select>
           </div>
         </div>
-        <div class="field"><label>Link de YouTube (no listado)</label><input type="url" placeholder="https://youtube.com/watch?v=..." /></div>
-        <div class="field"><label>Descripción</label><textarea placeholder="De qué trata esta clase..."></textarea></div>
+        <div class="field"><label>Link de YouTube (no listado)</label><input id="clase-youtube" type="url" placeholder="https://youtube.com/watch?v=..." /></div>
+        <div class="field"><label>Descripción</label><textarea id="clase-descripcion" placeholder="De qué trata esta clase..."></textarea></div>
         <div class="field"><label>PDF de materiales (opcional)</label><input type="file" accept=".pdf" /></div>
-        <button class="add-btn">Guardar clase</button>
+        <div class="error-msg" id="clase-error"></div>
+        <button class="add-btn" id="clase-btn" onclick="guardarClase()">Guardar clase</button>
       </div>
+      <div id="lista-clases"></div>
     </div>
 
     <div class="section" id="sec-quiz">
@@ -417,6 +420,77 @@
       await supabase.auth.signOut();
       window.location.href = 'edr-login.html';
     });
+
+    // ── Clases ────────────────────────────────────────────────────
+    async function cargarClases() {
+      if (!session) return;
+      const { data: clases } = await supabase
+        .from('clases')
+        .select('*')
+        .eq('profesor_id', session.user.id)
+        .order('creado_en', { ascending: false });
+
+      const lista = document.getElementById('lista-clases');
+      const emptyState = document.querySelector('#sec-clases .empty-state');
+
+      if (!clases || clases.length === 0) {
+        if (emptyState) emptyState.style.display = 'block';
+        lista.innerHTML = ''; return;
+      }
+
+      if (emptyState) emptyState.style.display = 'none';
+      lista.innerHTML = clases.map(c => `
+        <div class="clase-item">
+          <div class="clase-icon">▶️</div>
+          <div class="item-info">
+            <div class="item-title">${c.titulo}</div>
+            <div class="item-meta">${c.grupo}${c.descripcion ? ' · ' + c.descripcion.slice(0, 60) : ''}</div>
+          </div>
+          <span class="badge ${c.estado === 'publicada' ? 'pub' : 'draft'}">${c.estado === 'publicada' ? 'Publicada' : 'Borrador'}</span>
+        </div>
+      `).join('');
+    }
+
+    window.guardarClase = async function() {
+      const titulo      = document.getElementById('clase-titulo').value.trim();
+      const grupo       = document.getElementById('clase-grupo').value;
+      const youtube_url = document.getElementById('clase-youtube').value.trim();
+      const descripcion = document.getElementById('clase-descripcion').value.trim();
+      const errEl       = document.getElementById('clase-error');
+
+      errEl.textContent = ''; errEl.classList.remove('visible');
+
+      if (!titulo) {
+        errEl.textContent = 'El título es obligatorio.';
+        errEl.classList.add('visible'); return;
+      }
+
+      document.getElementById('clase-btn').classList.add('loading');
+
+      const { error } = await supabase.from('clases').insert({
+        titulo, grupo, youtube_url: youtube_url || null,
+        descripcion: descripcion || null,
+        estado: 'borrador',
+        profesor_id: session.user.id
+      });
+
+      document.getElementById('clase-btn').classList.remove('loading');
+
+      if (error) {
+        errEl.textContent = 'Error al guardar. Intentá de nuevo.';
+        errEl.classList.add('visible'); return;
+      }
+
+      // Limpiar form y cerrar
+      document.getElementById('clase-titulo').value = '';
+      document.getElementById('clase-youtube').value = '';
+      document.getElementById('clase-descripcion').value = '';
+      document.getElementById('form-clase').classList.remove('open');
+
+      cargarClases();
+    }
+
+    cargarClases();
 
     // ── Alumnos ───────────────────────────────────────────────────
     function generarUsuario(nombre) {
