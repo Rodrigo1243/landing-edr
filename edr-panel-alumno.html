@@ -228,8 +228,8 @@
     <div class="sidebar-inner">
       <div class="sidebar-logo"><span>Ed</span>R</div>
       <div class="sidebar-user">
-        <div class="sidebar-user-name">Tomás C.</div>
-        <div class="sidebar-user-role">Constructores · 10–12 años</div>
+        <div class="sidebar-user-name" id="alumno-nombre-sidebar">...</div>
+        <div class="sidebar-user-role" id="alumno-grupo-sidebar">...</div>
       </div>
       <div class="nav-item active" data-target="sec-inicio" onclick="navTo(this)">
         <span class="nav-icon">🏠</span> Inicio
@@ -253,10 +253,10 @@
 
     <div class="section" id="sec-inicio">
       <div class="welcome-card">
-        <div class="welcome-avatar">?</div>
+        <div class="welcome-avatar" id="alumno-avatar">?</div>
         <div>
-          <div class="welcome-name">¡Hola! 👋</div>
-          <div class="welcome-sub">Bienvenido a la plataforma EdR</div>
+          <div class="welcome-name" id="alumno-bienvenida">¡Hola! 👋</div>
+          <div class="welcome-sub" id="alumno-grupo-welcome">Bienvenido a la plataforma EdR</div>
         </div>
         <div class="welcome-prog">
           <div class="welcome-pct">0%</div>
@@ -304,6 +304,32 @@
   </main>
 
   <script>
+    // ── Cargar datos del alumno ───────────────────────────────────
+    const alumnoData = JSON.parse(sessionStorage.getItem('edr_alumno') || 'null');
+
+    if (!alumnoData) {
+      window.location.href = 'edr-login.html';
+    } else {
+      const nombre = alumnoData.nombre;
+      const grupo  = alumnoData.grupo;
+      const iniciales = nombre.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+
+      const grupos = { exploradores: 'Exploradores · 7–9 años', constructores: 'Constructores · 10–12 años', avanzados: 'Avanzados · 13–15 años' };
+
+      document.getElementById('alumno-nombre-sidebar').textContent = nombre;
+      document.getElementById('alumno-grupo-sidebar').textContent = grupos[grupo] || grupo;
+      document.getElementById('alumno-avatar').textContent = iniciales;
+      document.getElementById('alumno-bienvenida').textContent = '¡Hola, ' + nombre.split(' ')[0] + '! 👋';
+      document.getElementById('alumno-grupo-welcome').textContent = grupos[grupo] || grupo;
+    }
+
+    // ── Cerrar sesión ─────────────────────────────────────────────
+    document.querySelector('.sidebar-logout').addEventListener('click', () => {
+      sessionStorage.removeItem('edr_alumno');
+      window.location.href = 'edr-login.html';
+    });
+
+    // ── Navegación ────────────────────────────────────────────────
     const sections = ['sec-inicio','sec-clases','sec-quiz','sec-logros'];
     let isScrollingFromNav = false;
 
@@ -317,6 +343,7 @@
       setTimeout(() => { isScrollingFromNav = false; }, 800);
       closeSidebar();
     }
+    window.navTo = navTo;
 
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('open');
@@ -326,6 +353,8 @@
       document.getElementById('sidebar').classList.remove('open');
       document.getElementById('overlay').classList.remove('open');
     }
+    window.toggleSidebar = toggleSidebar;
+    window.closeSidebar = closeSidebar;
 
     window.addEventListener('scroll', () => {
       if (isScrollingFromNav) return;
