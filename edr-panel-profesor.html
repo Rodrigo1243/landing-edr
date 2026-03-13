@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>EdR — Panel Profesor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --verde: #5BBB3A;
+      --verde-dark: #3a8a22;
+      --verde-light: #f0f8ec;
+      --verde-bg: #d4e8c8;
+      --negro: #111b0e;
+      --texto: #111b0e;
+      --texto-muted: #5a7a52;
+      --texto-dark: #1a3a14;
+      --border: #e2edd9;
+      --bg: #f7fbf4;
+      --sidebar-w: 220px;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      display: flex;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--negro);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      height: -webkit-fill-available;
+      overflow-y: auto;
+      z-index: 100;
+      transition: transform .3s ease;
+    }
+    .sidebar-inner { padding: 28px 0 40px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+
+    .sidebar-logo {
+      font-family: 'Space Mono', monospace;
+      font-size: 20px; font-weight: 700;
+      color: var(--verde); padding: 0 22px 22px;
+      letter-spacing: -1px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      margin-bottom: 10px;
+    }
+    .sidebar-logo span { color: #fff; }
+
+    .sidebar-user {
+      padding: 0 22px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      margin-bottom: 10px;
+    }
+    .sidebar-user-name { font-size: 14px; font-weight: 700; color: #fff; }
+    .sidebar-user-role { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 3px; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 22px; cursor: pointer;
+      font-size: 14px; font-weight: 600;
+      color: rgba(255,255,255,.5);
+      border-left: 3px solid transparent;
+      transition: all .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.04); }
+    .nav-item.active { color: var(--verde); border-left-color: var(--verde); background: rgba(91,187,58,.08); }
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    .sidebar-logout {
+      margin-top: auto;
+      padding: 11px 22px;
+      display: flex; align-items: center; gap: 12px;
+      font-size: 13px; font-weight: 600;
+      color: rgba(255,255,255,.3);
+      cursor: pointer; transition: color .15s;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .sidebar-logout:hover { color: rgba(255,255,255,.7); }
+
+    /* ── MOBILE HAMBURGER ── */
+    .hamburger {
+      display: none;
+      position: fixed; top: 16px; left: 16px; z-index: 200;
+      background: var(--negro); border: none; border-radius: 10px;
+      padding: 10px 12px; cursor: pointer; color: var(--verde);
+      font-size: 18px; line-height: 1;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .overlay {
+      display: none;
+      position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 99;
+    }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      padding: 36px 36px 80px;
+      min-height: 100vh;
+    }
+
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-size: 18px; font-weight: 800; color: var(--texto);
+      margin-bottom: 18px; padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+    .stat-card {
+      background: #fff; border-radius: 14px;
+      border: 1px solid var(--border); padding: 18px 20px;
+    }
+    .stat-n { font-size: 30px; font-weight: 800; color: var(--verde); font-family: 'Space Mono', monospace; }
+    .stat-l { font-size: 12px; color: var(--texto-muted); margin-top: 4px; font-weight: 600; }
+
+    /* Clases */
+    .clase-item {
+      background: #fff; border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 16px 18px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .clase-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: var(--verde-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .item-info { flex: 1; min-width: 0; }
+    .item-title { font-size: 15px; font-weight: 700; color: var(--texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-meta { font-size: 12px; color: var(--texto-muted); margin-top: 4px; }
+
+    .badge { font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 100px; white-space: nowrap; }
+    .badge.pub { background: var(--verde-light); color: var(--verde-dark); }
+    .badge.draft { background: #fff8e6; color: #a07000; }
+    .badge.activo { background: var(--verde-light); color: var(--verde-dark); }
+
+    .add-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px; border-radius: 100px;
+      background: var(--verde); color: #fff; border: none;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 14px;
+      transition: background .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .add-btn:hover { background: var(--verde-dark); }
+
+    /* Formulario */
+    .form-card {
+      background: #fff; border-radius: 14px;
+      border: 1px solid var(--border); padding: 22px;
+      margin-top: 16px; display: none;
+    }
+    .form-card.open { display: block; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .field label { font-size: 12px; font-weight: 700; color: var(--texto); }
+    .field input, .field select, .field textarea {
+      padding: 11px 13px; border-radius: 8px;
+      border: 1.5px solid #dce8d8;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px; color: var(--texto);
+      background: #fff; outline: none;
+      transition: border-color .2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--verde); }
+    .field textarea { resize: vertical; min-height: 80px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* Quiz */
+    .quiz-item {
+      background: #fff; border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 16px 18px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .quiz-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: #f0f0ff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+
+    /* Alumnos */
+    .alumno-row {
+      background: #fff; border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 16px 18px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .alumno-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--verde-bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: var(--texto-dark); flex-shrink: 0;
+    }
+    .progress-wrap { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+    .progress-bar { width: 100px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--verde); border-radius: 3px; }
+    .progress-pct { font-size: 13px; font-weight: 700; color: var(--verde-dark); min-width: 38px; text-align: right; }
+
+    /* ── RESPONSIVE ── */
+    .empty-state {
+      background: #fff; border-radius: 14px;
+      border: 1.5px dashed var(--border);
+      padding: 36px 20px; margin-bottom: 14px;
+      text-align: center;
+    }
+    .empty-icon { font-size: 32px; margin-bottom: 10px; }
+    .empty-title { font-size: 15px; font-weight: 700; color: var(--texto); margin-bottom: 4px; }
+    .empty-sub { font-size: 13px; color: var(--texto-muted); }
+
+    @media (max-width: 768px) {
+      .hamburger { display: flex; align-items: center; justify-content: center; }
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .overlay.open { display: block; }
+      .main { margin-left: 0; padding: 72px 20px 80px; }
+      .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .form-row { grid-template-columns: 1fr; }
+      .progress-bar { width: 70px; }
+    }
+
+    @media (max-width: 480px) {
+      .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .clase-item, .quiz-item, .alumno-row { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+      <div class="sidebar-logo"><span>Ed</span>R</div>
+      <div class="sidebar-user">
+        <div class="sidebar-user-name">Marcelo Cejas</div>
+        <div class="sidebar-user-role">Profesor</div>
+      </div>
+      <div class="nav-item active" data-target="sec-resumen" onclick="navTo(this)">
+        <span class="nav-icon">📊</span> Resumen
+      </div>
+      <div class="nav-item" data-target="sec-clases" onclick="navTo(this)">
+        <span class="nav-icon">🎬</span> Mis clases
+      </div>
+      <div class="nav-item" data-target="sec-quiz" onclick="navTo(this)">
+        <span class="nav-icon">📝</span> Quizzes
+      </div>
+      <div class="nav-item" data-target="sec-progreso" onclick="navTo(this)">
+        <span class="nav-icon">👥</span> Progreso
+      </div>
+      <div class="sidebar-logout" onclick="window.location.href='edr-login.html'">
+        <span>⬅</span> Cerrar sesión
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main" id="main-scroll">
+
+    <div class="section" id="sec-resumen">
+      <div class="section-title">📊 Resumen</div>
+      <div class="stats">
+        <div class="stat-card"><div class="stat-n">0</div><div class="stat-l">Alumnos activos</div></div>
+        <div class="stat-card"><div class="stat-n">0</div><div class="stat-l">Clases publicadas</div></div>
+        <div class="stat-card"><div class="stat-n">0</div><div class="stat-l">Quizzes creados</div></div>
+        <div class="stat-card"><div class="stat-n">—</div><div class="stat-l">Completitud media</div></div>
+      </div>
+    </div>
+
+    <div class="section" id="sec-clases">
+      <div class="section-title">🎬 Mis clases</div>
+      <div class="empty-state">
+        <div class="empty-icon">🎬</div>
+        <div class="empty-title">Todavía no subiste ninguna clase</div>
+        <div class="empty-sub">Subí tu primer video con el botón de abajo.</div>
+      </div>
+      <button class="add-btn" onclick="toggleForm()">+ Subir nueva clase</button>
+      <div class="form-card" id="form-clase">
+        <div class="form-row">
+          <div class="field"><label>Título</label><input type="text" placeholder="Ej: Intro a Arduino" /></div>
+          <div class="field"><label>Grupo</label>
+            <select>
+              <option>Exploradores (7–9 años)</option>
+              <option>Constructores (10–12 años)</option>
+              <option>Avanzados (13–15 años)</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Link de YouTube (no listado)</label><input type="url" placeholder="https://youtube.com/watch?v=..." /></div>
+        <div class="field"><label>Descripción</label><textarea placeholder="De qué trata esta clase..."></textarea></div>
+        <div class="field"><label>PDF de materiales (opcional)</label><input type="file" accept=".pdf" /></div>
+        <button class="add-btn">Guardar clase</button>
+      </div>
+    </div>
+
+    <div class="section" id="sec-quiz">
+      <div class="section-title">📝 Quizzes</div>
+      <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <div class="empty-title">Todavía no creaste ningún quiz</div>
+        <div class="empty-sub">Creá tu primer quiz con el botón de abajo.</div>
+      </div>
+      <button class="add-btn">+ Crear nuevo quiz</button>
+    </div>
+
+    <div class="section" id="sec-progreso">
+      <div class="section-title">👥 Progreso de alumnos</div>
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <div class="empty-title">Todavía no hay alumnos registrados</div>
+        <div class="empty-sub">Una vez que agregues alumnos, vas a ver su progreso acá.</div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const sections = ['sec-resumen','sec-clases','sec-quiz','sec-progreso'];
+    let isScrollingFromNav = false;
+
+    function navTo(el) {
+      const target = document.getElementById(el.getAttribute('data-target'));
+      if (!target) return;
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      el.classList.add('active');
+      isScrollingFromNav = true;
+      window.scrollTo({ top: target.offsetTop - 20, behavior: 'smooth' });
+      setTimeout(() => { isScrollingFromNav = false; }, 800);
+      closeSidebar();
+    }
+
+    function toggleForm() {
+      document.getElementById('form-clase').classList.toggle('open');
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('overlay').classList.toggle('open');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('open');
+    }
+
+    window.addEventListener('scroll', () => {
+      if (isScrollingFromNav) return;
+      const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 10;
+      if (atBottom) { setActiveNav(sections[sections.length - 1]); return; }
+      let current = sections[0];
+      sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el.offsetTop <= window.scrollY + 100) current = id;
+      });
+      setActiveNav(current);
+    });
+
+    function setActiveNav(id) {
+      document.querySelectorAll('.nav-item').forEach((n, i) => {
+        n.classList.toggle('active', sections[i] === id);
+      });
+    }
+  </script>
+</body>
+</html>
