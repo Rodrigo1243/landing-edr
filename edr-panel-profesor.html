@@ -254,7 +254,7 @@
     <div class="sidebar-inner">
       <div class="sidebar-logo"><span>Ed</span>R</div>
       <div class="sidebar-user">
-        <div class="sidebar-user-name">Marcelo Cejas</div>
+        <div class="sidebar-user-name" id="user-name">...</div>
         <div class="sidebar-user-role">Profesor</div>
       </div>
       <div class="nav-item active" data-target="sec-resumen" onclick="navTo(this)">
@@ -269,7 +269,7 @@
       <div class="nav-item" data-target="sec-progreso" onclick="navTo(this)">
         <span class="nav-icon">👥</span> Progreso
       </div>
-      <div class="sidebar-logout" onclick="window.location.href='edr-login.html'">
+      <div class="sidebar-logout" id="btn-logout">
         <span>⬅</span> Cerrar sesión
       </div>
     </div>
@@ -335,11 +335,43 @@
 
   </main>
 
-  <script>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const SUPABASE_URL = 'https://ramparvmpdzynnhsubey.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhbXBhcnZtcGR6eW5uaHN1YmV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MTk3MTYsImV4cCI6MjA4ODk5NTcxNn0.LKZv1CMwZTBiLT7FWmTRJxF2GHmbTmQPnVZgyhDqrLE';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ── Verificar sesión activa ───────────────────────────────────
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      window.location.href = 'edr-login.html';
+    } else {
+      // Cargar nombre del profesor
+      const { data: perfil } = await supabase
+        .from('profesores')
+        .select('nombre')
+        .eq('id', session.user.id)
+        .single();
+
+      if (perfil) {
+        document.getElementById('user-name').textContent = perfil.nombre;
+      } else {
+        document.getElementById('user-name').textContent = session.user.email;
+      }
+    }
+
+    // ── Cerrar sesión ─────────────────────────────────────────────
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.href = 'edr-login.html';
+    });
+
+    // ── Navegación ────────────────────────────────────────────────
     const sections = ['sec-resumen','sec-clases','sec-quiz','sec-progreso'];
     let isScrollingFromNav = false;
 
-    function navTo(el) {
+    window.navTo = function(el) {
       const target = document.getElementById(el.getAttribute('data-target'));
       if (!target) return;
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -350,18 +382,20 @@
       closeSidebar();
     }
 
-    function toggleForm() {
+    window.toggleForm = function() {
       document.getElementById('form-clase').classList.toggle('open');
     }
 
-    function toggleSidebar() {
+    window.toggleSidebar = function() {
       document.getElementById('sidebar').classList.toggle('open');
       document.getElementById('overlay').classList.toggle('open');
     }
+
     function closeSidebar() {
       document.getElementById('sidebar').classList.remove('open');
       document.getElementById('overlay').classList.remove('open');
     }
+    window.closeSidebar = closeSidebar;
 
     window.addEventListener('scroll', () => {
       if (isScrollingFromNav) return;
@@ -369,8 +403,7 @@
       if (atBottom) { setActiveNav(sections[sections.length - 1]); return; }
       let current = sections[0];
       sections.forEach(id => {
-        const el = document.getElementById(id);
-        if (el.offsetTop <= window.scrollY + 100) current = id;
+        if (document.getElementById(id).offsetTop <= window.scrollY + 100) current = id;
       });
       setActiveNav(current);
     });
