@@ -203,6 +203,64 @@
     .empty-title { font-size: 15px; font-weight: 700; color: var(--texto); margin-bottom: 4px; }
     .empty-sub { font-size: 13px; color: var(--texto-muted); }
 
+    /* ── PANTALLA DE CLASE ── */
+    .pantalla-clase {
+      display: none;
+      position: fixed; inset: 0; z-index: 500;
+      background: var(--bg);
+      overflow-y: auto;
+    }
+    .pantalla-clase.open { display: block; }
+    .clase-header {
+      background: var(--negro);
+      padding: 16px 24px;
+      display: flex; align-items: center; gap: 14px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .clase-back {
+      background: none; border: none;
+      color: var(--verde); font-size: 22px;
+      cursor: pointer; padding: 4px; line-height: 1;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .clase-header-title { font-size: 16px; font-weight: 700; color: #fff; }
+    .clase-header-sub { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 2px; }
+    .clase-body { padding: 24px; max-width: 900px; margin: 0 auto; }
+    .video-wrap {
+      position: relative; padding-bottom: 56.25%;
+      height: 0; border-radius: 14px; overflow: hidden;
+      background: #000; margin-bottom: 24px;
+    }
+    .video-wrap iframe {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%; border: none;
+    }
+    .clase-descripcion-box {
+      background: #fff; border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 18px 20px; margin-bottom: 20px;
+      font-size: 14px; line-height: 1.7; color: var(--texto);
+    }
+    .pdf-viewer {
+      background: #fff; border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden; margin-bottom: 20px;
+    }
+    .pdf-header {
+      padding: 14px 18px; display: flex;
+      align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .pdf-title { font-size: 14px; font-weight: 700; color: var(--texto); }
+    .pdf-download {
+      padding: 8px 16px; border-radius: 100px;
+      background: var(--verde); color: #fff; border: none;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      text-decoration: none; display: inline-block;
+    }
+    .pdf-embed { width: 100%; height: 500px; border: none; display: block; }
+
     @media (max-width: 768px) {
       .hamburger { display: flex; align-items: center; justify-content: center; }
       .sidebar { transform: translateX(-100%); }
@@ -300,6 +358,30 @@
 
   </main>
 
+  <!-- PANTALLA DE CLASE -->
+  <div class="pantalla-clase" id="pantalla-clase">
+    <div class="clase-header">
+      <button class="clase-back" onclick="cerrarClase()">←</button>
+      <div>
+        <div class="clase-header-title" id="clase-header-titulo">Clase</div>
+        <div class="clase-header-sub" id="clase-header-grupo"></div>
+      </div>
+    </div>
+    <div class="clase-body">
+      <div class="video-wrap" id="clase-video-wrap">
+        <iframe id="clase-iframe" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+      </div>
+      <div class="clase-descripcion-box" id="clase-desc-box" style="display:none;"></div>
+      <div class="pdf-viewer" id="clase-pdf-viewer" style="display:none;">
+        <div class="pdf-header">
+          <span class="pdf-title">📄 Material de la clase</span>
+          <a id="pdf-download-btn" class="pdf-download" target="_blank" download>⬇ Descargar PDF</a>
+        </div>
+        <iframe id="pdf-embed" class="pdf-embed"></iframe>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -327,7 +409,7 @@
       // Cargar clases publicadas del grupo del alumno
       const { data: clases } = await supabase
         .from('clases')
-        .select('id, titulo, grupo, youtube_url, descripcion')
+        .select('id, titulo, grupo, youtube_url, descripcion, pdf_url')
         .eq('estado', 'publicada')
         .eq('grupo', grupo)
         .order('creado_en', { ascending: true });
@@ -336,6 +418,8 @@
       if (!clases || clases.length === 0) {
         lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🎬</div><div class="empty-title">Todavía no hay clases disponibles</div><div class="empty-sub">Tu profe está preparando el material. ¡Pronto vas a tener clases acá!</div></div>`;
       } else {
+        // Guardar clases para abrirlas
+        window._clases = clases;
         lista.innerHTML = clases.map((c, i) => `
           <div class="clase-card">
             <div class="clase-thumb"><div class="play-btn">▶</div></div>
@@ -344,11 +428,66 @@
               <div class="item-meta">Clase ${i + 1}${c.descripcion ? ' · ' + c.descripcion.slice(0, 50) : ''}</div>
             </div>
             <div class="clase-actions">
-              ${c.youtube_url ? `<button class="btn-ver" onclick="window.open('${c.youtube_url}','_blank')">Ver →</button>` : ''}
+              <button class="btn-ver" onclick="abrirClase('${c.id}')">Ver →</button>
+              ${c.pdf_url ? `<a class="btn-pdf" href="${c.pdf_url}" target="_blank" download>📄 PDF</a>` : ''}
             </div>
           </div>
         `).join('');
       }
+    }
+
+    // ── Pantalla de clase ─────────────────────────────────────────
+    window.abrirClase = function(id) {
+      const c = (window._clases || []).find(x => x.id === id);
+      if (!c) return;
+
+      const grupos = { exploradores: 'Exploradores', constructores: 'Constructores', avanzados: 'Avanzados' };
+      document.getElementById('clase-header-titulo').textContent = c.titulo;
+      document.getElementById('clase-header-grupo').textContent = grupos[c.grupo] || c.grupo;
+
+      // Video YouTube — convertir URL a embed
+      const videoWrap = document.getElementById('clase-video-wrap');
+      const iframe = document.getElementById('clase-iframe');
+      if (c.youtube_url) {
+        const videoId = c.youtube_url.match(/(?:v=|youtu\.be\/)([^&\s]+)/)?.[1];
+        if (videoId) {
+          iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
+          videoWrap.style.display = 'block';
+        } else {
+          videoWrap.style.display = 'none';
+        }
+      } else {
+        videoWrap.style.display = 'none';
+      }
+
+      // Descripción
+      const descBox = document.getElementById('clase-desc-box');
+      if (c.descripcion) {
+        descBox.textContent = c.descripcion;
+        descBox.style.display = 'block';
+      } else {
+        descBox.style.display = 'none';
+      }
+
+      // PDF
+      const pdfViewer = document.getElementById('clase-pdf-viewer');
+      if (c.pdf_url) {
+        document.getElementById('pdf-embed').src = c.pdf_url;
+        document.getElementById('pdf-download-btn').href = c.pdf_url;
+        pdfViewer.style.display = 'block';
+      } else {
+        pdfViewer.style.display = 'none';
+      }
+
+      document.getElementById('pantalla-clase').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    window.cerrarClase = function() {
+      document.getElementById('pantalla-clase').classList.remove('open');
+      document.getElementById('clase-iframe').src = '';
+      document.getElementById('pdf-embed').src = '';
+      document.body.style.overflow = '';
     }
 
     // ── Cerrar sesión ─────────────────────────────────────────────
