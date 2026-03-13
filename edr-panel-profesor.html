@@ -217,6 +217,16 @@
     .progress-pct { font-size: 13px; font-weight: 700; color: var(--verde-dark); min-width: 38px; text-align: right; }
 
     /* ── RESPONSIVE ── */
+    .error-msg {
+      font-size: 13px; color: #c0392b; font-weight: 600;
+      margin-bottom: 0; height: 0; overflow: hidden;
+      transition: height .2s, margin .2s;
+    }
+    .error-msg.visible {
+      height: auto; margin-bottom: 8px;
+      background: #fdf0ed; border-radius: 8px; padding: 10px 12px;
+    }
+
     .empty-state {
       background: #fff; border-radius: 14px;
       border: 1.5px dashed var(--border);
@@ -268,6 +278,9 @@
       </div>
       <div class="nav-item" data-target="sec-progreso" onclick="navTo(this)">
         <span class="nav-icon">👥</span> Progreso
+      </div>
+      <div class="nav-item" data-target="sec-alumnos" onclick="navTo(this)">
+        <span class="nav-icon">🎒</span> Mis alumnos
       </div>
       <div class="sidebar-logout" id="btn-logout">
         <span>⬅</span> Cerrar sesión
@@ -333,6 +346,44 @@
       </div>
     </div>
 
+    <div class="section" id="sec-alumnos">
+      <div class="section-title">🎒 Mis alumnos</div>
+
+      <!-- Formulario nuevo alumno -->
+      <div class="form-card open" id="form-alumno">
+        <div style="font-size:14px;font-weight:700;color:var(--texto);margin-bottom:14px;">+ Agregar alumno</div>
+        <div class="form-row">
+          <div class="field">
+            <label>Nombre completo</label>
+            <input id="alu-nombre" type="text" placeholder="Ej: Tomás Castillo" />
+          </div>
+          <div class="field">
+            <label>Grupo</label>
+            <select id="alu-grupo">
+              <option value="exploradores">Exploradores (7–9 años)</option>
+              <option value="constructores">Constructores (10–12 años)</option>
+              <option value="avanzados">Avanzados (13–15 años)</option>
+            </select>
+          </div>
+        </div>
+        <div class="error-msg" id="alu-error"></div>
+        <button class="add-btn" id="alu-btn" onclick="crearAlumno()">Crear alumno</button>
+      </div>
+
+      <!-- Credenciales generadas -->
+      <div id="alu-credenciales" style="display:none;background:#f0f8ec;border:1.5px solid var(--verde);border-radius:14px;padding:18px 20px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:700;color:var(--verde-dark);margin-bottom:10px;">✅ Alumno creado — compartí estas credenciales:</div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;">
+          <div><div style="font-size:11px;color:var(--texto-muted);font-weight:700;">USUARIO</div><div id="cred-usuario" style="font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--texto);margin-top:4px;"></div></div>
+          <div><div style="font-size:11px;color:var(--texto-muted);font-weight:700;">CONTRASEÑA</div><div id="cred-password" style="font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--texto);margin-top:4px;"></div></div>
+        </div>
+        <button onclick="copiarCredenciales()" style="margin-top:12px;background:var(--verde);color:#fff;border:none;border-radius:100px;padding:9px 18px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📋 Copiar credenciales</button>
+      </div>
+
+      <!-- Lista de alumnos -->
+      <div id="lista-alumnos"></div>
+    </div>
+
   </main>
 
   <script type="module">
@@ -367,8 +418,106 @@
       window.location.href = 'edr-login.html';
     });
 
+    // ── Alumnos ───────────────────────────────────────────────────
+    function generarUsuario(nombre) {
+      const partes = nombre.trim().toLowerCase().split(' ');
+      const base = partes[0] + (partes[1] ? '.' + partes[1][0] : '');
+      return base.replace(/[^a-z0-9.]/g, '');
+    }
+
+    function generarPassword() {
+      const n = Math.floor(1000 + Math.random() * 9000);
+      return 'EDR-' + n;
+    }
+
+    async function cargarAlumnos() {
+      if (!session) return;
+      const { data: alumnos } = await supabase
+        .from('alumnos')
+        .select('id, nombre, usuario, password_hash, grupo')
+        .eq('profesor_id', session.user.id)
+        .order('creado_en', { ascending: false });
+
+      const lista = document.getElementById('lista-alumnos');
+      if (!alumnos || alumnos.length === 0) {
+        lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🎒</div><div class="empty-title">Todavía no agregaste alumnos</div><div class="empty-sub">Usá el formulario de arriba para crear el primero.</div></div>`;
+        return;
+      }
+      lista.innerHTML = alumnos.map(a => `
+        <div class="alumno-row">
+          <div class="alumno-avatar">${a.nombre.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase()}</div>
+          <div class="item-info">
+            <div class="item-title">${a.nombre}</div>
+            <div class="item-meta">${a.grupo} · usuario: <strong>${a.usuario}</strong> · contraseña: <strong>${a.password_hash}</strong></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.crearAlumno = async function() {
+      const nombre = document.getElementById('alu-nombre').value.trim();
+      const grupo  = document.getElementById('alu-grupo').value;
+      const errEl  = document.getElementById('alu-error');
+
+      errEl.textContent = ''; errEl.classList.remove('visible');
+
+      if (!nombre) {
+        errEl.textContent = 'Ingresá el nombre del alumno.';
+        errEl.classList.add('visible'); return;
+      }
+
+      document.getElementById('alu-btn').classList.add('loading');
+
+      const usuario  = generarUsuario(nombre);
+      const password = generarPassword();
+
+      // Verificar que el usuario no exista
+      const { data: existe } = await supabase
+        .from('alumnos').select('id').eq('usuario', usuario);
+
+      const usuarioFinal = existe && existe.length > 0
+        ? usuario + Math.floor(10 + Math.random() * 90)
+        : usuario;
+
+      const { error } = await supabase.from('alumnos').insert({
+        nombre,
+        usuario: usuarioFinal,
+        password_hash: password,
+        grupo,
+        profesor_id: session.user.id
+      });
+
+      document.getElementById('alu-btn').classList.remove('loading');
+
+      if (error) {
+        errEl.textContent = 'Error al crear el alumno. Intentá de nuevo.';
+        errEl.classList.add('visible'); return;
+      }
+
+      // Mostrar credenciales
+      document.getElementById('cred-usuario').textContent = usuarioFinal;
+      document.getElementById('cred-password').textContent = password;
+      document.getElementById('alu-credenciales').style.display = 'block';
+      document.getElementById('alu-nombre').value = '';
+
+      // Recargar lista
+      cargarAlumnos();
+    }
+
+    window.copiarCredenciales = function() {
+      const u = document.getElementById('cred-usuario').textContent;
+      const p = document.getElementById('cred-password').textContent;
+      navigator.clipboard.writeText(`Usuario: ${u}\nContraseña: ${p}`);
+      const btn = event.target;
+      btn.textContent = '✅ Copiado!';
+      setTimeout(() => btn.textContent = '📋 Copiar credenciales', 2000);
+    }
+
+    // Cargar alumnos al iniciar
+    cargarAlumnos();
+
     // ── Navegación ────────────────────────────────────────────────
-    const sections = ['sec-resumen','sec-clases','sec-quiz','sec-progreso'];
+    const sections = ['sec-resumen','sec-clases','sec-quiz','sec-progreso','sec-alumnos'];
     let isScrollingFromNav = false;
 
     window.navTo = function(el) {
