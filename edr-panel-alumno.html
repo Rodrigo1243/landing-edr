@@ -275,11 +275,7 @@
 
     <div class="section" id="sec-clases">
       <div class="section-title">🎬 Mis clases</div>
-      <div class="empty-state">
-        <div class="empty-icon">🎬</div>
-        <div class="empty-title">Todavía no hay clases disponibles</div>
-        <div class="empty-sub">Tu profe está preparando el material. ¡Pronto vas a tener clases acá!</div>
-      </div>
+      <div id="lista-clases-alumno"></div>
     </div>
 
     <div class="section" id="sec-quiz">
@@ -304,7 +300,13 @@
 
   </main>
 
-  <script>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const SUPABASE_URL = 'https://ramparvmpdzynnhsubey.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhbXBhcnZtcGR6eW5uaHN1YmV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MTk3MTYsImV4cCI6MjA4ODk5NTcxNn0.LKZv1CMwZTBiLT7FWmTRJxF2GHmbTmQPnVZgyhDqrLE';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
     // ── Cargar datos del alumno ───────────────────────────────────
     const alumnoData = JSON.parse(sessionStorage.getItem('edr_alumno') || 'null');
 
@@ -314,7 +316,6 @@
       const nombre = alumnoData.nombre;
       const grupo  = alumnoData.grupo;
       const iniciales = nombre.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
-
       const grupos = { exploradores: 'Exploradores · 7–9 años', constructores: 'Constructores · 10–12 años', avanzados: 'Avanzados · 13–15 años' };
 
       document.getElementById('alumno-nombre-sidebar').textContent = nombre;
@@ -322,6 +323,32 @@
       document.getElementById('alumno-avatar').textContent = iniciales;
       document.getElementById('alumno-bienvenida').textContent = '¡Hola, ' + nombre.split(' ')[0] + '! 👋';
       document.getElementById('alumno-grupo-welcome').textContent = grupos[grupo] || grupo;
+
+      // Cargar clases publicadas del grupo del alumno
+      const { data: clases } = await supabase
+        .from('clases')
+        .select('id, titulo, grupo, youtube_url, descripcion')
+        .eq('estado', 'publicada')
+        .eq('grupo', grupo)
+        .order('creado_en', { ascending: true });
+
+      const lista = document.getElementById('lista-clases-alumno');
+      if (!clases || clases.length === 0) {
+        lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🎬</div><div class="empty-title">Todavía no hay clases disponibles</div><div class="empty-sub">Tu profe está preparando el material. ¡Pronto vas a tener clases acá!</div></div>`;
+      } else {
+        lista.innerHTML = clases.map((c, i) => `
+          <div class="clase-card">
+            <div class="clase-thumb"><div class="play-btn">▶</div></div>
+            <div class="item-info">
+              <div class="item-title">${c.titulo}</div>
+              <div class="item-meta">Clase ${i + 1}${c.descripcion ? ' · ' + c.descripcion.slice(0, 50) : ''}</div>
+            </div>
+            <div class="clase-actions">
+              ${c.youtube_url ? `<button class="btn-ver" onclick="window.open('${c.youtube_url}','_blank')">Ver →</button>` : ''}
+            </div>
+          </div>
+        `).join('');
+      }
     }
 
     // ── Cerrar sesión ─────────────────────────────────────────────

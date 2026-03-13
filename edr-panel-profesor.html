@@ -304,12 +304,8 @@
 
     <div class="section" id="sec-clases">
       <div class="section-title">🎬 Mis clases</div>
-      <div class="empty-state">
-        <div class="empty-icon">🎬</div>
-        <div class="empty-title">Todavía no subiste ninguna clase</div>
-        <div class="empty-sub">Subí tu primer video con el botón de abajo.</div>
-      </div>
-      <button class="add-btn" onclick="toggleForm()">+ Subir nueva clase</button>
+      <div id="lista-clases"></div>
+      <button class="add-btn" onclick="toggleForm()" style="margin-top:4px;">+ Subir nueva clase</button>
       <div class="form-card" id="form-clase">
         <div class="form-row">
           <div class="field"><label>Título</label><input id="clase-titulo" type="text" placeholder="Ej: Intro a Arduino" /></div>
@@ -327,7 +323,6 @@
         <div class="error-msg" id="clase-error"></div>
         <button class="add-btn" id="clase-btn" onclick="guardarClase()">Guardar clase</button>
       </div>
-      <div id="lista-clases"></div>
     </div>
 
     <div class="section" id="sec-quiz">
@@ -431,14 +426,12 @@
         .order('creado_en', { ascending: false });
 
       const lista = document.getElementById('lista-clases');
-      const emptyState = document.querySelector('#sec-clases .empty-state');
 
       if (!clases || clases.length === 0) {
-        if (emptyState) emptyState.style.display = 'block';
-        lista.innerHTML = ''; return;
+        lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🎬</div><div class="empty-title">Todavía no subiste ninguna clase</div><div class="empty-sub">Subí tu primer video con el botón de abajo.</div></div>`;
+        return;
       }
 
-      if (emptyState) emptyState.style.display = 'none';
       lista.innerHTML = clases.map(c => `
         <div class="clase-item">
           <div class="clase-icon">▶️</div>
@@ -446,7 +439,15 @@
             <div class="item-title">${c.titulo}</div>
             <div class="item-meta">${c.grupo}${c.descripcion ? ' · ' + c.descripcion.slice(0, 60) : ''}</div>
           </div>
-          <span class="badge ${c.estado === 'publicada' ? 'pub' : 'draft'}">${c.estado === 'publicada' ? 'Publicada' : 'Borrador'}</span>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+            <span class="badge ${c.estado === 'publicada' ? 'pub' : 'draft'}">${c.estado === 'publicada' ? 'Publicada' : 'Borrador'}</span>
+            <button onclick="togglePublicar('${c.id}','${c.estado}')" style="padding:6px 14px;border-radius:100px;border:1.5px solid var(--verde);background:#fff;color:var(--verde-dark);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">
+              ${c.estado === 'publicada' ? 'Despublicar' : 'Publicar'}
+            </button>
+            <button onclick="borrarClase('${c.id}')" style="padding:6px 10px;border-radius:100px;border:1.5px solid #e0c0c0;background:#fff;color:#c0392b;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">
+              🗑
+            </button>
+          </div>
         </div>
       `).join('');
     }
@@ -487,6 +488,18 @@
       document.getElementById('clase-descripcion').value = '';
       document.getElementById('form-clase').classList.remove('open');
 
+      cargarClases();
+    }
+
+    window.togglePublicar = async function(id, estadoActual) {
+      const nuevoEstado = estadoActual === 'publicada' ? 'borrador' : 'publicada';
+      await supabase.from('clases').update({ estado: nuevoEstado }).eq('id', id);
+      cargarClases();
+    }
+
+    window.borrarClase = async function(id) {
+      if (!confirm('¿Seguro que querés borrar esta clase? No se puede deshacer.')) return;
+      await supabase.from('clases').delete().eq('id', id);
       cargarClases();
     }
 
