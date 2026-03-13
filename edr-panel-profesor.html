@@ -414,14 +414,30 @@
 
     // ── Resumen ───────────────────────────────────────────────────
     async function cargarResumen() {
-      const [{ count: totalAlumnos }, { count: totalClases }] = await Promise.all([
+      const [{ count: totalAlumnos }, { count: totalClases }, { data: alumnos }, { data: todasClases }, { data: todoProgreso }] = await Promise.all([
         supabase.from('alumnos').select('*', { count: 'exact', head: true }),
-        supabase.from('clases').select('*', { count: 'exact', head: true })
-          .eq('profesor_id', session.user.id).eq('estado', 'publicada')
+        supabase.from('clases').select('*', { count: 'exact', head: true }).eq('profesor_id', session.user.id).eq('estado', 'publicada'),
+        supabase.from('alumnos').select('id, grupo'),
+        supabase.from('clases').select('id, grupo').eq('estado', 'publicada'),
+        supabase.from('progreso_alumnos').select('alumno_id, clase_id')
       ]);
+
       const stats = document.querySelectorAll('.stat-n');
       if (stats[0]) stats[0].textContent = totalAlumnos || 0;
       if (stats[1]) stats[1].textContent = totalClases || 0;
+
+      // Calcular completitud media
+      if (alumnos && alumnos.length > 0 && todasClases && todasClases.length > 0) {
+        const porcentajes = alumnos.map(a => {
+          const clasesDeSuGrupo = todasClases.filter(c => c.grupo === a.grupo).length;
+          const clasesVistas = (todoProgreso || []).filter(p => p.alumno_id === a.id).length;
+          return clasesDeSuGrupo > 0 ? (clasesVistas / clasesDeSuGrupo) * 100 : 0;
+        });
+        const media = Math.round(porcentajes.reduce((a, b) => a + b, 0) / porcentajes.length);
+        if (stats[3]) stats[3].textContent = media + '%';
+      } else {
+        if (stats[3]) stats[3].textContent = '—';
+      }
     }
 
     cargarResumen();

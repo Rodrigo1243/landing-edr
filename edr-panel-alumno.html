@@ -343,16 +343,32 @@
 
     <div class="section" id="sec-logros">
       <div class="section-title">🏆 Mis logros</div>
-      <div class="logros">
-        <div class="logro locked"><div class="logro-icon">🤖</div><div><div class="logro-label">Primer clase</div><div class="logro-sub">Mirá tu primera clase</div></div></div>
-        <div class="logro locked"><div class="logro-icon">⚡</div><div><div class="logro-label">3 clases seguidas</div><div class="logro-sub">¡Racha activa!</div></div></div>
-        <div class="logro locked"><div class="logro-icon">📝</div><div><div class="logro-label">Primer quiz</div><div class="logro-sub">Completá un quiz</div></div></div>
-        <div class="logro locked"><div class="logro-icon">🌟</div><div><div class="logro-label">Módulo completo</div><div class="logro-sub">Terminá todas las clases</div></div></div>
-        <div class="logro locked"><div class="logro-icon">🏅</div><div><div class="logro-label">Quiz perfecto</div><div class="logro-sub">10/10 en un quiz</div></div></div>
+      <div class="logros" id="lista-logros">
+        <div class="logro locked" id="logro-primera-clase"><div class="logro-icon">🤖</div><div><div class="logro-label">Primer clase</div><div class="logro-sub">Mirá tu primera clase</div></div></div>
+        <div class="logro locked" id="logro-tres-clases"><div class="logro-icon">⚡</div><div><div class="logro-label">3 clases vistas</div><div class="logro-sub">¡Seguí así!</div></div></div>
+        <div class="logro locked" id="logro-primer-quiz"><div class="logro-icon">📝</div><div><div class="logro-label">Primer quiz</div><div class="logro-sub">Completá un quiz</div></div></div>
+        <div class="logro locked" id="logro-modulo"><div class="logro-icon">🌟</div><div><div class="logro-label">Módulo completo</div><div class="logro-sub">Terminá todas las clases</div></div></div>
+        <div class="logro locked" id="logro-quiz-perfecto"><div class="logro-icon">🏅</div><div><div class="logro-label">Quiz perfecto</div><div class="logro-sub">10/10 en un quiz</div></div></div>
       </div>
     </div>
 
   </main>
+
+  <!-- POPUP LOGRO -->
+  <div id="logro-popup" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:1000;background:var(--negro);color:#fff;border-radius:16px;padding:16px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,.3);min-width:280px;animation:slideUp .4s ease;">
+    <div style="font-size:32px;" id="popup-icon">🤖</div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--verde);letter-spacing:1px;text-transform:uppercase;">¡Logro desbloqueado!</div>
+      <div style="font-size:15px;font-weight:800;margin-top:3px;" id="popup-titulo"></div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes slideUp {
+      from { opacity:0; transform:translateX(-50%) translateY(20px); }
+      to   { opacity:1; transform:translateX(-50%) translateY(0); }
+    }
+  </style>
 
   <!-- PANTALLA DE CLASE -->
   <div class="pantalla-clase" id="pantalla-clase">
@@ -429,6 +445,7 @@
         lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🎬</div><div class="empty-title">Todavía no hay clases disponibles</div><div class="empty-sub">Tu profe está preparando el material. ¡Pronto vas a tener clases acá!</div></div>`;
       } else {
         renderClases();
+        actualizarLogros();
       }
     }
 
@@ -540,11 +557,54 @@
       }
     }
 
+    // ── Logros ────────────────────────────────────────────────────
+    function actualizarLogros() {
+      const vistas = window._vistas ? window._vistas.size : 0;
+      const total  = window._clases ? window._clases.length : 0;
+
+      const checks = [
+        { id: 'logro-primera-clase', unlock: vistas >= 1,        icon: '🤖', label: '¡Primera clase vista!' },
+        { id: 'logro-tres-clases',   unlock: vistas >= 3,        icon: '⚡', label: '¡3 clases vistas!' },
+        { id: 'logro-modulo',        unlock: total > 0 && vistas >= total, icon: '🌟', label: '¡Módulo completo!' },
+      ];
+
+      const nuevos = [];
+      checks.forEach(c => {
+        const el = document.getElementById(c.id);
+        if (!el) return;
+        const eraLocked = el.classList.contains('locked');
+        if (c.unlock) {
+          el.classList.remove('locked');
+          if (eraLocked) nuevos.push({ icon: c.icon, label: c.label });
+        }
+      });
+
+      return nuevos;
+    }
+
+    function mostrarPopupLogro(icon, label) {
+      const popup = document.getElementById('logro-popup');
+      document.getElementById('popup-icon').textContent = icon;
+      document.getElementById('popup-titulo').textContent = label;
+      popup.style.display = 'flex';
+      popup.style.animation = 'none';
+      popup.offsetHeight; // reflow
+      popup.style.animation = 'slideUp .4s ease';
+      clearTimeout(window._popupTimer);
+      window._popupTimer = setTimeout(() => { popup.style.display = 'none'; }, 3500);
+    }
+
     window.cerrarClase = function() {
       document.getElementById('pantalla-clase').classList.remove('open');
       document.getElementById('clase-iframe').src = '';
       document.getElementById('pdf-embed').src = '';
       document.body.style.overflow = '';
+
+      // Verificar logros nuevos
+      const nuevos = actualizarLogros();
+      if (nuevos.length > 0) {
+        setTimeout(() => mostrarPopupLogro(nuevos[0].icon, nuevos[0].label), 400);
+      }
     }
 
     // ── Cerrar sesión ─────────────────────────────────────────────
