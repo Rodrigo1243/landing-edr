@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>EdR — Plataforma de aprendizaje</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --verde: #5BBB3A;
+      --verde-dark: #3a8a22;
+      --verde-light: #f0f8ec;
+      --verde-bg: #d4e8c8;
+      --negro: #111b0e;
+      --texto: #111b0e;
+      --texto-muted: #5a7a52;
+      --texto-dark: #1a3a14;
+      --border: #a8c8a0;
+      --placeholder: #9ab890;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--negro);
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      background: var(--verde);
+      opacity: .06;
+      pointer-events: none;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 40px 36px 36px;
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo {
+      font-family: 'Space Mono', monospace;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--negro);
+      text-align: center;
+      letter-spacing: -1px;
+      margin-bottom: 6px;
+    }
+    .logo em { color: var(--verde); font-style: normal; }
+
+    .tagline {
+      font-size: 13px;
+      color: var(--texto-muted);
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .toggle {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .toggle button {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 2px solid var(--verde);
+      background: #fff;
+      color: var(--verde-dark);
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .toggle button.active {
+      background: var(--verde);
+      color: #fff;
+    }
+
+    .role-badge {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+      padding: 7px 14px;
+      border-radius: 100px;
+      background: var(--verde-bg);
+      color: var(--texto-dark);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .field label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--texto);
+    }
+    .field input {
+      padding: 13px 14px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      color: var(--texto);
+      background: #fff;
+      outline: none;
+      transition: border-color .2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .field input:focus { border-color: var(--verde); }
+    .field input::placeholder { color: var(--placeholder); }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 100px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      text-align: center;
+      border: none;
+      background: var(--verde);
+      color: #fff;
+      transition: background .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover, .btn:active { background: var(--verde-dark); }
+    .btn.outline {
+      background: #fff;
+      color: var(--verde-dark);
+      border: 2px solid var(--verde);
+      margin-top: 10px;
+    }
+    .btn.outline:hover, .btn.outline:active { background: var(--verde-light); }
+
+    .foot {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--texto-muted);
+    }
+    .foot a {
+      color: var(--verde-dark);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .info-box {
+      background: var(--verde-light);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--texto-dark);
+      line-height: 1.6;
+      border-left: 3px solid var(--verde);
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .error-msg {
+      font-size: 13px; color: #c0392b; font-weight: 600;
+      margin-bottom: 0; height: 0; overflow: hidden;
+      transition: height .2s, margin .2s;
+    }
+    .error-msg.visible {
+      height: auto; margin-bottom: 8px;
+      background: #fdf0ed; border-radius: 8px; padding: 10px 12px;
+    }
+    .btn.loading { opacity: .7; pointer-events: none; }
+    .btn.loading::after { content: ' ⏳'; }
+
+    @media (max-width: 480px) {
+      .card { padding: 32px 24px 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="blob" style="width:600px;height:600px;top:-200px;right:-180px"></div>
+  <div class="blob" style="width:300px;height:300px;bottom:-100px;left:-80px"></div>
+
+  <div class="card">
+    <div class="logo">Ed<em>R</em></div>
+    <div class="tagline">Plataforma de aprendizaje</div>
+
+    <div class="toggle">
+      <button id="btn-prof">Soy profesor</button>
+      <button id="btn-alum">Soy alumno</button>
+    </div>
+
+    <!-- Login profesor -->
+    <div class="screen" id="scr-login">
+      <span class="role-badge" id="role-label">Acceso profesores</span>
+      <div class="field"><label>Email</label><input id="login-email" type="email" placeholder="tu@email.com" autocomplete="email" /></div>
+      <div class="field"><label>Contraseña</label><input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password" /></div>
+      <div class="error-msg" id="login-error"></div>
+      <button class="btn" id="login-btn" onclick="loginProfesor()">Ingresar →</button>
+      <div id="reg-link">
+        <button class="btn outline" onclick="goTo('scr-register')">Crear cuenta de profesor</button>
+      </div>
+      <div class="foot"><a href="#">¿Olvidaste tu contraseña?</a></div>
+    </div>
+
+    <!-- Registro profesor -->
+    <div class="screen" id="scr-register">
+      <span class="role-badge">Nueva cuenta · Profesor</span>
+      <div class="field"><label>Nombre completo</label><input id="reg-nombre" type="text" placeholder="Ej: Marcelo Cejas" autocomplete="name" /></div>
+      <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="tu@email.com" autocomplete="email" /></div>
+      <div class="field"><label>Contraseña</label><input id="reg-password" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" /></div>
+      <div class="field"><label>Código de escuela</label><input id="reg-codigo" type="text" placeholder="Código que te dio la dirección" /></div>
+      <div class="info-box">🔒 Solo pueden registrarse con el código que entrega la dirección de la escuela.</div>
+      <div class="error-msg" id="reg-error"></div>
+      <button class="btn" id="reg-btn" onclick="registrarProfesor()">Crear cuenta →</button>
+      <button class="btn outline" onclick="goTo('scr-login')">← Volver al login</button>
+    </div>
+
+    <!-- Login alumno -->
+    <div class="screen" id="scr-alumno">
+      <span class="role-badge">Acceso alumnos</span>
+      <div class="field"><label>Usuario</label><input id="alumno-usuario" type="text" placeholder="Ej: tomas2025" autocomplete="username" /></div>
+      <div class="field"><label>Contraseña</label><input id="alumno-password" type="password" placeholder="••••••••" autocomplete="current-password" /></div>
+      <div class="info-box">👋 Tu usuario y contraseña los recibís de tu profe. Si no los tenés, consultale a Marcela, Marcelo o Mariela.</div>
+      <div class="error-msg" id="alumno-error"></div>
+      <button class="btn" id="alumno-btn" onclick="loginAlumno()">Ingresar →</button>
+      <div class="foot"><a href="#">Tengo un problema para ingresar</a></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const SUPABASE_URL = 'https://ramparvmpdzynnhsubey.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhbXBhcnZtcGR6eW5uaHN1YmV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MTk3MTYsImV4cCI6MjA4ODk5NTcxNn0.LKZv1CMwZTBiLT7FWmTRJxF2GHmbTmQPnVZgyhDqrLE';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ── Helpers UI ───────────────────────────────────────────────
+    const VERDE = '#5BBB3A', BLANCO = '#ffffff', VERDE_DARK = '#3a8a22';
+    const STYLE_ACTIVE   = { background: VERDE,   color: BLANCO,     border: '2px solid ' + VERDE };
+    const STYLE_INACTIVE = { background: BLANCO,  color: VERDE_DARK, border: '2px solid ' + VERDE };
+
+    function applyStyle(el, styles) { Object.assign(el.style, styles); }
+
+    function setRole(role) {
+      const btnProf = document.getElementById('btn-prof');
+      const btnAlum = document.getElementById('btn-alum');
+      applyStyle(role === 'profesor' ? btnProf : btnAlum, STYLE_ACTIVE);
+      applyStyle(role === 'profesor' ? btnAlum : btnProf, STYLE_INACTIVE);
+      document.getElementById('role-label').textContent = role === 'profesor' ? 'Acceso profesores' : 'Acceso alumnos';
+      document.getElementById('reg-link').style.display = role === 'profesor' ? 'block' : 'none';
+      goTo(role === 'alumno' ? 'scr-alumno' : 'scr-login');
+    }
+
+    function goTo(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.classList.add('visible');
+    }
+
+    function clearError(id) {
+      const el = document.getElementById(id);
+      el.textContent = '';
+      el.classList.remove('visible');
+    }
+
+    function setLoading(btnId, loading) {
+      document.getElementById(btnId).classList.toggle('loading', loading);
+    }
+
+    // ── Login Profesor ───────────────────────────────────────────
+    async function loginProfesor() {
+      clearError('login-error');
+      const email    = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (!email || !password) {
+        showError('login-error', 'Completá todos los campos.'); return;
+      }
+
+      setLoading('login-btn', true);
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setLoading('login-btn', false);
+
+      if (error) {
+        showError('login-error', 'Email o contraseña incorrectos.');
+      } else {
+        window.location.href = 'edr-panel-profesor.html';
+      }
+    }
+
+    // ── Registro Profesor ────────────────────────────────────────
+    async function registrarProfesor() {
+      clearError('reg-error');
+      const nombre   = document.getElementById('reg-nombre').value.trim();
+      const email    = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const codigo   = document.getElementById('reg-codigo').value.trim().toUpperCase();
+
+      if (!nombre || !email || !password || !codigo) {
+        showError('reg-error', 'Completá todos los campos.'); return;
+      }
+      if (password.length < 8) {
+        showError('reg-error', 'La contraseña debe tener al menos 8 caracteres.'); return;
+      }
+
+      setLoading('reg-btn', true);
+
+      // 1. Validar código de escuela
+      const { data: codigos, error: errorCodigo } = await supabase
+        .from('codigos_escuela')
+        .select('id')
+        .eq('codigo', codigo)
+        .eq('activo', true);
+
+      if (errorCodigo || !codigos || codigos.length === 0) {
+        setLoading('reg-btn', false);
+        showError('reg-error', 'Código de escuela inválido o inactivo.'); return;
+      }
+
+      // 2. Crear usuario en Supabase Auth
+      const { data, error: errorAuth } = await supabase.auth.signUp({ email, password });
+
+      if (errorAuth) {
+        setLoading('reg-btn', false);
+        showError('reg-error', 'No se pudo crear la cuenta: ' + errorAuth.message); return;
+      }
+
+      // 3. Guardar perfil del profesor
+      const { error: errorPerfil } = await supabase
+        .from('profesores')
+        .insert({ id: data.user.id, nombre, email });
+
+      setLoading('reg-btn', false);
+
+      if (errorPerfil) {
+        showError('reg-error', 'Error al guardar el perfil. Intentá de nuevo.'); return;
+      }
+
+      // Éxito — ir al panel
+      window.location.href = 'edr-panel-profesor.html';
+    }
+
+    // ── Login Alumno ─────────────────────────────────────────────
+    async function loginAlumno() {
+      clearError('alumno-error');
+      const usuario  = document.getElementById('alumno-usuario').value.trim().toLowerCase();
+      const password = document.getElementById('alumno-password').value;
+
+      if (!usuario || !password) {
+        showError('alumno-error', 'Completá todos los campos.'); return;
+      }
+
+      setLoading('alumno-btn', true);
+
+      // Buscar el alumno por usuario
+      const { data: alumnos, error } = await supabase
+        .from('alumnos')
+        .select('id, nombre, password_hash, grupo')
+        .eq('usuario', usuario);
+
+      if (error || !alumnos || alumnos.length === 0) {
+        setLoading('alumno-btn', false);
+        showError('alumno-error', 'Usuario no encontrado.'); return;
+      }
+
+      const alumno = alumnos[0];
+
+      // Verificar contraseña (comparación simple por ahora)
+      if (alumno.password_hash !== password) {
+        setLoading('alumno-btn', false);
+        showError('alumno-error', 'Contraseña incorrecta.'); return;
+      }
+
+      // Guardar sesión del alumno en sessionStorage
+      sessionStorage.setItem('edr_alumno', JSON.stringify({
+        id: alumno.id,
+        nombre: alumno.nombre,
+        grupo: alumno.grupo,
+        usuario
+      }));
+
+      setLoading('alumno-btn', false);
+      window.location.href = 'edr-panel-alumno.html';
+    }
+
+    // ── Exponer funciones al HTML ────────────────────────────────
+    window.loginProfesor     = loginProfesor;
+    window.registrarProfesor = registrarProfesor;
+    window.loginAlumno       = loginAlumno;
+    window.setRole           = setRole;
+    window.goTo              = goTo;
+
+    // ── Init ─────────────────────────────────────────────────────
+    document.getElementById('btn-prof').addEventListener('click', () => setRole('profesor'));
+    document.getElementById('btn-alum').addEventListener('click', () => setRole('alumno'));
+    setRole('profesor');
+
+    // Si ya hay sesión activa de profesor, redirigir directo
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) window.location.href = 'edr-panel-profesor.html';
+  </script>
+</body>
+</html>
