@@ -636,10 +636,11 @@
 
     // ── Progreso ──────────────────────────────────────────────────
     async function cargarProgreso() {
-      const { data: alumnos } = await supabase
-        .from('alumnos')
-        .select('id, nombre, usuario, grupo')
-        .order('nombre', { ascending: true });
+      const [{ data: alumnos }, { data: todasClases }, { data: todoProgreso }] = await Promise.all([
+        supabase.from('alumnos').select('id, nombre, usuario, grupo').order('nombre'),
+        supabase.from('clases').select('id, grupo').eq('estado', 'publicada'),
+        supabase.from('progreso_alumnos').select('alumno_id, clase_id')
+      ]);
 
       const lista = document.getElementById('lista-progreso');
 
@@ -652,16 +653,20 @@
 
       lista.innerHTML = alumnos.map(a => {
         const iniciales = a.nombre.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+        const clasesDeSuGrupo = (todasClases || []).filter(c => c.grupo === a.grupo).length;
+        const clasesVistas = (todoProgreso || []).filter(p => p.alumno_id === a.id).length;
+        const pct = clasesDeSuGrupo > 0 ? Math.round((clasesVistas / clasesDeSuGrupo) * 100) : 0;
+
         return `
           <div class="alumno-row">
             <div class="alumno-avatar">${iniciales}</div>
             <div class="item-info">
               <div class="item-title">${a.nombre}</div>
-              <div class="item-meta">${grupos[a.grupo] || a.grupo} · @${a.usuario}</div>
+              <div class="item-meta">${grupos[a.grupo] || a.grupo} · ${clasesVistas}/${clasesDeSuGrupo} clases vistas</div>
             </div>
             <div class="progress-wrap">
-              <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
-              <div class="progress-pct">0%</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+              <div class="progress-pct">${pct}%</div>
             </div>
           </div>
         `;

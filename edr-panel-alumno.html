@@ -406,38 +406,59 @@
       document.getElementById('alumno-bienvenida').textContent = '¡Hola, ' + nombre.split(' ')[0] + '! 👋';
       document.getElementById('alumno-grupo-welcome').textContent = grupos[grupo] || grupo;
 
-      // Cargar clases publicadas del grupo del alumno
-      const { data: clases } = await supabase
-        .from('clases')
-        .select('id, titulo, grupo, youtube_url, descripcion, pdf_url')
-        .eq('estado', 'publicada')
-        .eq('grupo', grupo)
-        .order('creado_en', { ascending: true });
+      // Cargar clases y progreso del alumno
+      const [{ data: clases }, { data: vistas }] = await Promise.all([
+        supabase.from('clases')
+          .select('id, titulo, grupo, youtube_url, descripcion, pdf_url')
+          .eq('estado', 'publicada')
+          .eq('grupo', grupo)
+          .order('creado_en', { ascending: true }),
+        supabase.from('progreso_alumnos')
+          .select('clase_id')
+          .eq('alumno_id', alumnoData.id)
+      ]);
+
+      window._clases = clases || [];
+      window._vistas = new Set((vistas || []).map(v => v.clase_id));
+
+      // Actualizar barra de progreso global
+      const total = (clases || []).length;
+      const vistasCount = window._vistas.size;
+      const pct = total > 0 ? Math.round((vistasCount / total) * 100) : 0;
+      document.querySelector('.welcome-pct').textContent = pct + '%';
+      document.querySelector('.welcome-bar-fill').style.width = pct + '%';
 
       const lista = document.getElementById('lista-clases-alumno');
       if (!clases || clases.length === 0) {
         lista.innerHTML = `<div class="empty-state"><div class="empty-icon">🎬</div><div class="empty-title">Todavía no hay clases disponibles</div><div class="empty-sub">Tu profe está preparando el material. ¡Pronto vas a tener clases acá!</div></div>`;
       } else {
-        // Guardar clases para abrirlas
-        window._clases = clases;
-        lista.innerHTML = clases.map((c, i) => `
-          <div class="clase-card">
-            <div class="clase-thumb"><div class="play-btn">▶</div></div>
+        renderClases();
+      }
+    }
+
+    function renderClases() {
+      const lista = document.getElementById('lista-clases-alumno');
+      lista.innerHTML = window._clases.map((c, i) => {
+        const vista = window._vistas.has(c.id);
+        return `
+          <div class="clase-card" id="card-${c.id}">
+            <div class="clase-thumb"><div class="play-btn" style="${vista ? 'background:var(--verde-dark)' : ''}">▶</div></div>
             <div class="item-info">
               <div class="item-title">${c.titulo}</div>
               <div class="item-meta">Clase ${i + 1}${c.descripcion ? ' · ' + c.descripcion.slice(0, 50) : ''}</div>
             </div>
             <div class="clase-actions">
+              ${vista ? '<span class="badge-done">✓ Vista</span>' : ''}
               <button class="btn-ver" onclick="abrirClase('${c.id}')">Ver →</button>
               ${c.pdf_url ? `<a class="btn-pdf" href="${c.pdf_url}" target="_blank" download>📄 PDF</a>` : ''}
             </div>
           </div>
-        `).join('');
-      }
+        `;
+      }).join('');
     }
 
     // ── Pantalla de clase ─────────────────────────────────────────
-    window.abrirClase = function(id) {
+    window.abrirClase = async function(id) {
       const c = (window._clases || []).find(x => x.id === id);
       if (!c) return;
 
@@ -481,6 +502,25 @@
 
       document.getElementById('pantalla-clase').classList.add('open');
       document.body.style.overflow = 'hidden';
+
+      // Registrar vista si no la vio antes
+      const alumnoData = JSON.parse(sessionStorage.getItem('edr_alumno') || 'null');
+      if (alumnoData && !window._vistas.has(id)) {
+        await supabase.from('progreso_alumnos').insert({
+          alumno_id: alumnoData.id,
+          clase_id: id
+        });
+        window._vistas.add(id);
+
+        // Actualizar barra de progreso
+        const total = window._clases.length;
+        const pct = Math.round((window._vistas.size / total) * 100);
+        document.querySelector('.welcome-pct').textContent = pct + '%';
+        document.querySelector('.welcome-bar-fill').style.width = pct + '%';
+
+        // Actualizar card a "vista"
+        renderClases();
+      }
     }
 
     window.cerrarClase = function() {
