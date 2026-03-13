@@ -543,6 +543,7 @@
       .nav-links { display: none; }
       .nav-cta { display: none; }
       .nav-login { display: none; }
+      nav > div { display: none; }
       .hamburger { display: flex; }
       .mobile-menu { display: block; }
       section { padding: 52px 24px; }
@@ -582,8 +583,10 @@
     <li><a href="#profesores">Profesores</a></li>
     <li><a href="#inscripcion">Contacto</a></li>
   </ul>
-  <button class="nav-cta" onclick="document.getElementById('inscripcion').scrollIntoView({behavior:'smooth'})">Inscribirse</button>
-  <a href="edr-login.html" class="nav-login">Iniciar sesión</a>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <a href="edr-login.html" class="nav-login">Iniciar sesión</a>
+    <button class="nav-cta" onclick="document.getElementById('inscripcion').scrollIntoView({behavior:'smooth'})">Inscribirse</button>
+  </div>
   <button class="hamburger" id="hamburger" aria-label="Menú">
     <span></span><span></span><span></span>
   </button>
